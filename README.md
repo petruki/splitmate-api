@@ -10,13 +10,12 @@ Example:
 ```
 {
   "dev": {
-    "PORT": "3000"
+    "PORT": "3000",
+    "MONGODB_URI": "mongodb://splitmate:splitmate@127.0.0.1:27017/splitmate-api"
   },
   "prod": {
-    "PORT": "3000"
   },
   "test": {
-    "PORT": "3000"
   }
 }
 ```
