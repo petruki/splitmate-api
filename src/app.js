@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 
+/**
+ * Initialize MongoDB and Switcher API context
+ */
 require('./db/mongoose');
+require('./external/switcher-api-facade');
 
 const app = express();
 

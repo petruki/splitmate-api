@@ -11,7 +11,10 @@ Example:
 {
   "dev": {
     "PORT": "3000",
-    "MONGODB_URI": "mongodb://splitmate:splitmate@127.0.0.1:27017/splitmate-api"
+    "MONGODB_URI": "mongodb://splitmate:splitmate@127.0.0.1:27017/splitmate-api",
+    "SWITCHER_API_KEY": "[SWITCHER_API_KEY]",
+    "SWITCHER_API_URL": "https://switcher-load-balance.herokuapp.com",
+    "SWITCHER_API_OFFLINE": "true"
   },
   "prod": {
   },
