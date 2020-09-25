@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const userRouter = require('./routers/user');
+const eventRouter = require('./routers/event');
 
 /**
  * Initialize MongoDB and Switcher API context
@@ -18,6 +20,8 @@ app.use(cors());
 /**
  * API Routers
  */
+app.use(userRouter);
+app.use(eventRouter);
 app.get('/check', (req, res) => {
     res.status(200).send({ message: 'All good', code: 200 })
 });
