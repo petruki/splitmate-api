@@ -20,13 +20,10 @@ const eventSchema = new mongoose.Schema({
     },
     organizer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     members: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    pending_members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
@@ -36,12 +33,6 @@ const eventSchema = new mongoose.Schema({
 eventSchema.virtual('v_members', {
     ref: 'User',
     localField: 'members',
-    foreignField: '_id'
-});
-
-eventSchema.virtual('v_pending_members', {
-    ref: 'User',
-    localField: 'pending_members',
     foreignField: '_id'
 });
 

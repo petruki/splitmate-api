@@ -27,7 +27,12 @@ const userSchema = new mongoose.Schema({
     },
     token: {
         type: String
-    }
+    },
+    events_pending: [{
+        event: {
+            type: mongoose.Schema.Types.ObjectId,
+        }
+    }]
 });
 
 userSchema.options.toJSON = {

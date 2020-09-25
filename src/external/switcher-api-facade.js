@@ -14,7 +14,7 @@ switcher.loadSnapshot();
 
 async function checkSignUp(email) {
     return await switcher.isItOn('SIGNUP', [
-        Switcher.StrategiesType.VALUE, email]);
+        Switcher.StrategiesType.VALUE, email]) ? true : new Error(`Email ${email} not allowed`);
 }
 
 module.exports = {
