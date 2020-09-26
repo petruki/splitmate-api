@@ -27,6 +27,6 @@ itemSchema.virtual('v_assigned_to', {
 const Item = mongoose.model('Item', itemSchema);
 
 module.exports = {
-    Item,
-    itemSchema
+    itemSchema,
+    Item
 };

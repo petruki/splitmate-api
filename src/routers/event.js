@@ -5,6 +5,7 @@ const { checkSignUp, checkSendMail } = require('../external/switcher-api-facade'
 const { Event } = require('../models/event');
 const { User } = require('../models/user');
 const { UserInvite } = require('../models/user-invite');
+const { Item } = require('../models/item'); 
 
 const router = new express.Router();
 
@@ -13,7 +14,7 @@ router.post('/event/create', [
     check('description').isLength({ max: 5000 }),
     check('location').isLength({ max: 500 }),
     check('organizer').isMongoId()
-], async (req, res) => {
+], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -67,6 +68,63 @@ router.patch('/event/:id', auth, [
         }
         
         req.updates.forEach((update) => event[update] = req.body[update]);
+        await event.save();
+        res.send(event);
+    } catch (e) {
+        res.status(500).send({ error: e.message });
+    }
+})
+
+router.patch('/event/:id/:action/item', auth, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).send();
+        }
+
+        switch (req.params.action) {
+            case 'add':
+                const item = new Item(req.body);
+                event.items.push(item);
+                break;
+            case 'pick':
+                if (!req.body.item) {
+                    throw new Error(`'item' name must be specified`);
+                }
+
+                event.items.forEach(item => {
+                    if (item.name === req.body.item) {
+                        item.assigned_to = req.user._id;
+                    }
+                })
+                break;
+            case 'unpick':
+                if (!req.body.item) {
+                    throw new Error(`'item' name must be specified`);
+                }
+
+                event.items.forEach(item => {
+                    if (item.name === req.body.item && String(item.assigned_to) === String(req.user._id)) {
+                        item.assigned_to = undefined;
+                    }
+                })
+                break;
+            break;
+            case 'delete':
+                if (!req.body.item) {
+                    throw new Error(`'item' name must be specified`);
+                }
+
+                const itemToDelete = event.items.filter(item => item.name === req.body.item);
+                if (itemToDelete.length)
+                    event.items.splice(event.items.indexOf(itemToDelete), 1);
+                break;
+            break;
+            default:
+                throw new Error('Invalid operation');
+        }
+        
         await event.save();
         res.send(event);
     } catch (e) {

@@ -538,6 +538,162 @@
 			"response": []
 		},
 		{
+			"name": "Event - Add Items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Beer\",\r\n    \"type\": \"Consumable\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/add/item",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6fb13540a0eb38f835b171",
+						"add",
+						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Delete Items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/delete/item",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6fb13540a0eb38f835b171",
+						"delete",
+						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Pick Items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/pick/item",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6fb13540a0eb38f835b171",
+						"pick",
+						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Unpick Items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/unpick/item",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6fb13540a0eb38f835b171",
+						"unpick",
+						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Event - Delete",
 			"request": {
 				"auth": {

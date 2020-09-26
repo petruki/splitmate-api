@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const item = require('./item');
-const { Item, itemSchema } = require('./item');
+const { itemSchema } = require('./item');
 
 const eventSchema = new mongoose.Schema({
     name: {
@@ -39,6 +39,18 @@ eventSchema.virtual('v_members', {
     localField: 'members',
     foreignField: '_id'
 });
+
+eventSchema.pre('save', async function (next) {
+    const event = this;
+    let duplicated = 0;
+    let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index);
+
+    if (findDuplicates(event.items.map(item => item.name)).length) {
+        throw new Error('Duplicated items found');
+    }
+
+    next();
+})
 
 const Event = mongoose.model('Event', eventSchema);
 

@@ -22,7 +22,7 @@ userInviteSchema.virtual('v_event', {
     foreignField: '_id'
 })
 
-const UserInvite = mongoose.model('TeamInvite', userInviteSchema);
+const UserInvite = mongoose.model('UserInvite', userInviteSchema);
 
 module.exports = {
     UserInvite
