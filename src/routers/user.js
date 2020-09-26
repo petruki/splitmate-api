@@ -50,7 +50,12 @@ router.post('/user/login', [
 
 router.post('/user/event/join', auth, async (req, res) => {
     try {
-        const event = await Event.findById(req.body.eventid);
+        const event = await Event.findOne({ _id: req.body.eventid, members: req.user._id });
+
+        if (!event) {
+            throw new Error('Event does not exist or member already joined');
+        }
+
         event.members.push(req.user._id);
         req.user.events_pending.splice(req.user.events_pending.indexOf(req.body.eventid), 1);
 

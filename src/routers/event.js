@@ -27,18 +27,19 @@ router.post('/event/create', [
 
 router.post('/event/invite/:id', auth, async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.username });
+        const user = await User.findOne({ email: req.body.email });
 
         if (!user) {
-            return res.status(404).send({ error: `User ${req.body.username} not found` });
+            //TODO: Send email
+        } else {
+            if (user.events_pending.include(req.param.id)) {
+                throw new Error('User already invited');
+            }
+    
+            user.events_pending.push(req.param.id);
+            await user.save();
         }
 
-        if (user.events_pending.include(req.param.id)) {
-            throw new Error('User already invited');
-        }
-
-        user.events_pending.push(req.param.id);
-        await user.save();
         res.send({ message: 'Invitation has been sent' });
     } catch (e) {
         res.status(500).send({ error: e.message });
