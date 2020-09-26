@@ -6,11 +6,10 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "env-cmd -e dev nodemon ./src/index.js",
-    "test": "jest --runInBand",
-    "test-local": "env-cmd -e test jest --runInBand"
+    "test": "jest --testEnvironment=node --runInBand",
+    "test-local": "env-cmd -e test jest --testEnvironment=node --runInBand"
   },
-  "author": "Roger Floriano",
-  "license": "MIT",
+  "author": "Rice & Beans",
   "dependencies": {
     "axios": "^0.19.2",
     "bcrypt": "^5.0.0",
@@ -33,6 +32,6 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/Rice-Beans/splitmate-api"
   }
 }

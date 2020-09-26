@@ -4,10 +4,9 @@ const userRouter = require('./routers/user');
 const eventRouter = require('./routers/event');
 
 /**
- * Initialize MongoDB and Switcher API context
+ * Initialize MongoDB
  */
 require('./db/mongoose');
-require('./external/switcher-api-facade');
 
 const app = express();
 
