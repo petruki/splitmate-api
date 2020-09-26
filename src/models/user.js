@@ -29,10 +29,15 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     events_pending: [{
-        event: {
-            type: mongoose.Schema.Types.ObjectId,
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event'
     }]
+});
+
+userSchema.virtual('v_events_pending', {
+    ref: 'Event',
+    localField: 'events_pending',
+    foreignField: '_id'
 });
 
 userSchema.options.toJSON = {
@@ -53,7 +58,7 @@ userSchema.methods.generateAuthToken = async function () {
     await user.save();
 
     return {
-        token
+        token: user.token
     };
 }
 

@@ -1,0 +1,693 @@
+{
+	"info": {
+		"_postman_id": "514aea5f-aed2-44ba-a25b-a897372207a5",
+		"name": "Splitmate API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User - Sign Up",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "93607578-fa60-48ed-9b1c-e2fa17f5522a",
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"    pm.environment.set('token', pm.response.json().jwt.token)\r",
+							"    pm.environment.set('userId', pm.response.json().user._id)\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Roger\",\r\n    \"username\": \"roger\",\r\n    \"email\": \"mail@mail.com\",\r\n    \"password\": \"123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/signup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12611584-5191-4f1f-9d8f-458a404e5bca",
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    pm.environment.set('token', pm.response.json().jwt.token)\r",
+							"    pm.environment.set('userId', pm.response.json().user._id)\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"roger\",\r\n    \"password\": \"123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3660131d-cc9f-4cda-8655-85c6ec10c0e4",
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    pm.environment.set('token', '')\r",
+							"    pm.environment.set('userId', '')\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/logout",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Delete Me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7416cc6c-6dcd-43fa-a911-349cae4546f1",
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    pm.environment.set('token', '')\r",
+							"    pm.environment.set('userId', '')\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/user/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Get Me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fc9b8235-c2a2-4cc0-935b-739a8d19162a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/user/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Find by username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d1884dc-01b2-46d9-a8d0-465940e7431a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/user/find?username=roger",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"find"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "roger"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Accept Join Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b550ffe1-6432-4a58-be09-d0dff315d149",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/join",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"join"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Leave  Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d3052f91-4835-4e4c-8850-11f159bf0e8a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/leave",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"leave"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Dismiss Event Invitation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f026d401-2fb9-4cec-8483-66dc3d717252",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/dismiss",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"dismiss"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Create",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"My Event\",\r\n    \"description\": \"This is a description\",\r\n    \"date\": \"2020-01-01\",\r\n    \"organizer\": \"{{userId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Create + Members",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"My Event\",\r\n    \"description\": \"This is a description\",\r\n    \"date\": \"2020-01-01\",\r\n    \"organizer\": \"{{userId}}\",\r\n    \"members\": [\r\n        \"{{userId}}\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Create + Items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"My Event\",\r\n    \"description\": \"This is a description\",\r\n    \"date\": \"2020-01-01\",\r\n    \"organizer\": \"{{userId}}\",\r\n    \"items\": [\r\n        {\r\n            \"name\": \"Rent\",\r\n            \"type\": \"Currency\",\r\n            \"assigned_to\": \"{{userId}}\"\r\n        },\r\n        {\r\n            \"name\": \"Beer\",\r\n            \"type\": \"Consumable\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6f8e86e1ade748985970a1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6f8e86e1ade748985970a1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - My Events",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Edit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"2021-02-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f6f8fb71dcdf429d8dc4bbf",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f6f8fb71dcdf429d8dc4bbf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Invite",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"mail@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/invite/5f6f8fb71dcdf429d8dc4bbf",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"invite",
+						"5f6f8fb71dcdf429d8dc4bbf"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -50,10 +50,14 @@ router.post('/user/login', [
 
 router.post('/user/event/join', auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.body.eventid, members: req.user._id });
+        const event = await Event.findOne({ _id: req.body.eventid });
 
         if (!event) {
-            throw new Error('Event does not exist or member already joined');
+            return res.status(404).send();
+        }
+
+        if (event.members.includes(req.user._id)) {
+            return res.status(400).send({ error: 'User already joined' });
         }
 
         event.members.push(req.user._id);
@@ -77,10 +81,26 @@ router.post('/user/event/dismiss', auth, async (req, res) => {
     }
 })
 
+router.post('/user/event/leave', auth, async (req, res) => {
+    try {
+        const event = await Event.findOne({ _id: req.body.eventid });
+
+        if (!event) {
+            return res.status(404).send();
+        }
+
+        event.members.splice(event.members.indexOf(req.user._id), 1);
+        await event.save();
+        res.send(event);
+    } catch (e) {
+        res.status(500).send({ error: e.message });
+    }
+})
+
 router.post('/user/logout', auth, async (req, res) => {
     req.user.token = null;
     await req.user.save();
-    res.send();
+    res.send({ message: 'Success' });
 })
 
 router.get('/user/me', auth, async (req, res) => {
@@ -89,12 +109,12 @@ router.get('/user/me', auth, async (req, res) => {
 
 router.get('/user/find', auth, async (req, res) => {
     let users = [];
-    if (req.query.username && req.query.username.lenght > 2) {
+    if (req.query.username.length && req.query.username.length > 2) {
         const foundUsers = await User.find({ username: req.query.username });
         users.push(foundUsers.map(u => {
             return {
                 id: u._id,
-                username: username
+                username: u.username
             }
         }));
     }

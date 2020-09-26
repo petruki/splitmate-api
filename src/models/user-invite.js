@@ -12,6 +12,8 @@ const userInviteSchema = new mongoose.Schema({
         required: true,
         ref: 'Event'
     }
+}, {
+    timestamps: true
 })
 
 userInviteSchema.virtual('v_event', {
