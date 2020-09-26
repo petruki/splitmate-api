@@ -3,6 +3,7 @@ const { check, validationResult } = require('express-validator');
 const { auth, verifyInputUpdateParameters } = require('../middleware/index');
 const { Event } = require('../models/event');
 const { User } = require('../models/user');
+const { UserInvite } = require('../models/user-invite');
 
 const router = new express.Router();
 
@@ -31,6 +32,8 @@ router.post('/event/invite/:id', auth, async (req, res) => {
 
         if (!user) {
             //TODO: Send email
+            const userInvite = new UserInvite({ email: req.body.email, eventid: req.param.id });
+            await userInvite.save();
         } else {
             if (user.events_pending.include(req.param.id)) {
                 throw new Error('User already invited');
