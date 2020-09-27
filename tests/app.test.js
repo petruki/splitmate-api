@@ -8,13 +8,10 @@ afterAll(async () => {
 })
 
 describe('Test APP', () => {
-
-  test('APP - Should be running', (done) => {
-    request(app)
+  test('APP - Should be running', async () => {
+    await request(app)
       .get('/check')
-      .send().expect(200).then(() => {
-        done();
-      });
-  }, 30000)
+      .send().expect(200);
+  })
 
 })
