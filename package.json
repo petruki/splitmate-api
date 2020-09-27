@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "env-cmd -e dev nodemon ./src/index.js",
-    "test": "jest --runInBand",
-    "test-local": "env-cmd -e test jest --runInBand"
+    "test": "jest --runInBand --detectOpenHandles",
+    "test-local": "env-cmd -e test jest --runInBand --detectOpenHandles"
   },
   "author": "Rice & Beans",
   "dependencies": {
@@ -27,7 +27,6 @@
     "env-cmd": "^10.0.1",
     "jest": "^24.9.0",
     "nodemon": "^1.19.4",
-    "sinon": "^9.0.2",
     "supertest": "^4.0.2"
   },
   "repository": {
