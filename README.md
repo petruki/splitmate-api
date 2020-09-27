@@ -16,8 +16,12 @@ Example:
 {
   "dev": {
     "PORT": "3000",
-    "MONGODB_URI": "mongodb://splitmate:splitmate@127.0.0.1:27017/splitmate-api",
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/splitmate-api",
     "JWT_SECRET": "[SECRET_HERE]",
+    "SENDGRID_API_KEY": "[SENDGRID_API_KEY]",
+    "SENDGRID_MAIL_FROM": "splitmateapp@gmail.com",
+    "SENDGRID_INVITE_TEMPLATE": "[SENDGRID_INVITE_TEMPLATE_ID]",
+    "SENDGRID_REMINDER_TEMPLATE": "[SENDGRID_REMINDER_TEMPLATE_ID]",
     "SWITCHER_API_KEY": "[SWITCHER_API_KEY]",
     "SWITCHER_API_URL": "https://switcher-load-balance.herokuapp.com",
     "SWITCHER_API_OFFLINE": "true"
