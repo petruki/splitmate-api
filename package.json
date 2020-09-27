@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "env-cmd -e dev nodemon ./src/index.js",
-    "test": "test jest --testEnvironment=node --runInBand",
-    "test-local": "env-cmd -e test jest --testEnvironment=node --runInBand"
+    "test": "jest --runInBand",
+    "test-local": "env-cmd -e test jest --runInBand"
   },
   "author": "Rice & Beans",
   "dependencies": {
