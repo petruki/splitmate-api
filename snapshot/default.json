@@ -1,0 +1,44 @@
+{
+    "data": {
+        "domain": {
+            "name": "Rice and Beans",
+            "version": 1600981231266,
+            "activated": true,
+            "group": [
+                {
+                    "name": "Release 1",
+                    "activated": true,
+                    "config": [
+                        {
+                            "key": "SIGNUP",
+                            "activated": true,
+                            "strategies": [
+                                {
+                                    "strategy": "VALUE_VALIDATION",
+                                    "activated": true,
+                                    "operation": "EXIST",
+                                    "values": [
+                                        "roger.petruki@gmail.com",
+                                        "mail@mail.com"
+                                    ]
+                                }
+                            ],
+                            "components": [
+                                "splitmate-api",
+                                "splitmate-app"
+                            ]
+                        },
+                        {
+                            "key": "SENDMAIL",
+                            "activated": false,
+                            "strategies": [],
+                            "components": [
+                                "splitmate-api"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

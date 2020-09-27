@@ -2,6 +2,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const { auth, verifyInputUpdateParameters } = require('../middleware/index');
 const { checkSignUp, checkSendMail } = require('../external/switcher-api-facade');
+const { sendInvite, sendReminder } = require('../external/sendgrid');
 const { Event } = require('../models/event');
 const { User } = require('../models/user');
 const { UserInvite } = require('../models/user-invite');
@@ -33,22 +34,54 @@ router.post('/event/create', [
 router.post('/event/invite/:id', auth, async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).send();
+        }
 
         if (!user) {
             await checkSendMail();
-            //TODO: Send email
-            const userInvite = new UserInvite({ email: req.body.email, eventid: req.params.id });
+            sendInvite(req.body.email, event.name);
+            const userInvite = new UserInvite({ email: req.body.email, eventid: event._id });
             await userInvite.save();
         } else {
-            if (user.events_pending.length && user.events_pending.includes(req.params.id)) {
+            if (user.events_pending.length && user.events_pending.includes(event._id)) {
                 throw new Error('User already invited');
             }
     
-            user.events_pending.push(req.params.id);
+            user.events_pending.push(event._id);
             await user.save();
         }
 
         res.send({ message: 'Invitation has been sent' });
+    } catch (e) {
+        res.status(500).send({ error: e.message });
+    }
+})
+
+router.post('/event/reminder/:id', auth, async (req, res) => {
+    try {
+        await checkSendMail();
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).send();
+        }
+
+        const pendingItems = event.items
+            .filter(item => !item.assigned_to)
+            .map(item => item.name);
+
+        if (pendingItems.length) {
+            await event.populate({ path: 'v_members' }).execPopulate();
+            event.v_members.forEach(member => {
+                sendReminder(member.email, event.name, pendingItems.join(', '));
+            });
+            res.send({ message: 'Reminder sent', items: pendingItems.join(', ') });
+        } else {
+            res.send({ message: 'There is no pending items for this event' });
+        }
     } catch (e) {
         res.status(500).send({ error: e.message });
     }

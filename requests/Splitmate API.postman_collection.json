@@ -887,6 +887,44 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Event - Send Reminder",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/reminder/5f7033f01dd3a32398c6f692",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"reminder",
+						"5f7033f01dd3a32398c6f692"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}
