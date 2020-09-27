@@ -1,3 +1,5 @@
+![Splitmate API](https://raw.githubusercontent.com/Rice-Beans/assets/master/splitmate/logo/splitmate.jpg)
+
 [![Build Status](https://travis-ci.com/Rice-Beans/splitmate-api.svg?branch=master)](https://travis-ci.com/Rice-Beans/splitmate-api)
 
 # Requirements  
