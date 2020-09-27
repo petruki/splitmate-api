@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "10"
+  - "12"
 
 jobs:
   include:
@@ -10,9 +10,6 @@ jobs:
     - stage: test
       script:
         - npm test
-    - stage: deploy
-      script:
-        - echo "Ready to deploy..."
 
 stages:
   - compile
