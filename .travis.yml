@@ -21,3 +21,4 @@ jobs:
 stages:
   - compile
   - test
+  - deploy
