@@ -7,6 +7,7 @@ const { Event } = require('../models/event');
 const { User } = require('../models/user');
 const { UserInvite } = require('../models/user-invite');
 const { Item } = require('../models/item'); 
+const { responseException, BadRequest, NotFoundError, PermissionError } = require('./common/index');
 
 const router = new express.Router();
 
@@ -23,11 +24,15 @@ router.post('/event/create', [
 
     try {
         const event = new Event(req.body);
+        if (event.items.length)
+            event.items.forEach(item => item.created_by = req.user._id);
+        event.members.push(req.user._id);
+        
         await event.save();
 
         res.status(201).send(event);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -37,7 +42,7 @@ router.post('/event/invite/:id', auth, async (req, res) => {
         const event = await Event.findById(req.params.id);
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
         if (!user) {
@@ -48,10 +53,10 @@ router.post('/event/invite/:id', auth, async (req, res) => {
         } else {
             if (!event.members.includes(user._id)) {
                 if (user.events_pending.length && user.events_pending.includes(event._id)) {
-                    throw new Error('User already invited');
+                    throw new BadRequest('User already invited');
                 }
             } else {
-                throw new Error('User already joined');
+                throw new BadRequest('User already joined');
             }
     
             user.events_pending.push(event._id);
@@ -60,7 +65,7 @@ router.post('/event/invite/:id', auth, async (req, res) => {
 
         res.send({ message: 'Invitation has been sent' });
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -70,7 +75,7 @@ router.post('/event/reminder/:id', auth, async (req, res) => {
         const event = await Event.findById(req.params.id);
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
         const pendingItems = event.items
@@ -84,10 +89,10 @@ router.post('/event/reminder/:id', auth, async (req, res) => {
             });
             res.send({ message: 'Reminder sent', items: pendingItems.join(', ') });
         } else {
-            res.send({ message: 'There is no pending items for this event' });
+            throw new BadRequest('There is no pending items for this event');
         }
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -101,14 +106,14 @@ router.patch('/event/:id', auth, [
         const event = await Event.findById(req.params.id);
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
         
         req.updates.forEach((update) => event[update] = req.body[update]);
         await event.save();
         res.send(event);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -117,47 +122,53 @@ router.patch('/event/:id/:action/item', auth, async (req, res) => {
         const event = await Event.findById(req.params.id);
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
-        if (!req.body.item) {
-            throw new Error(`'item' name must be specified`);
+        if (!req.body.name) {
+            throw new BadRequest(`'name' name must be specified`);
         }
 
         switch (req.params.action) {
             case 'add':
                 const item = new Item(req.body);
+                item.created_by = req.user._id;
                 event.items.push(item);
                 break;
             case 'pick':
                 event.items.forEach(item => {
-                    if (item.name === req.body.item)
+                    if (item.name === req.body.name)
                         item.assigned_to = req.user._id;
                 });
                 break;
             case 'unpick':
                 event.items.forEach(item => {
-                    if (item.name === req.body.item && 
+                    if (item.name === req.body.name && 
                         String(item.assigned_to) === String(req.user._id))
                         item.assigned_to = undefined;
                 });
                 break;
             break;
             case 'delete':
-                const itemToDelete = event.items.filter(item => item.name === req.body.item);
-                if (itemToDelete.length)
-                    event.items.splice(event.items.indexOf(itemToDelete), 1);
+                const itemToDelete = event.items.filter(item => item.name === req.body.name);
+                if (itemToDelete.length) {
+                    if (String(itemToDelete[0].created_by) === String(req.user._id)) {
+                        event.items.splice(event.items.indexOf(itemToDelete[0]), 1);
+                    } else {
+                        throw new BadRequest('Unable to delete this item');
+                    }
+                }
                 break;
             break;
             default:
-                throw new Error(
+                throw new BadRequest(
                     `Invalid operation '${req.params.action}' - try [add, pick, unpick, delete]`);
         }
         
         await event.save();
         res.send(event);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -166,13 +177,13 @@ router.delete('/event/:id', auth, async (req, res) => {
         const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
         await event.remove();
         res.send({ message: `Event '${event.name}' deleted` });
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 

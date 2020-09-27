@@ -12,6 +12,10 @@ const itemSchema = new mongoose.Schema({
     type: {
         type: String
     },
+    created_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     assigned_to: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -21,6 +25,12 @@ const itemSchema = new mongoose.Schema({
 itemSchema.virtual('v_assigned_to', {
     ref: 'User',
     localField: 'assigned_to',
+    foreignField: '_id'
+});
+
+itemSchema.virtual('v_created_by', {
+    ref: 'User',
+    localField: 'created_by',
     foreignField: '_id'
 });
 

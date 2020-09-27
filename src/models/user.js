@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Event } = require('./event');
+const { PermissionError, BadRequest } = require('../routers/common/index');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -66,13 +68,13 @@ userSchema.statics.findByCredentials = async (username, password) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-        throw new Error('Unable to login');
+        throw new PermissionError('Invalid email/password');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-        throw new Error('Unable to login');
+        throw new PermissionError('Invalid email/password');
     }
 
     return user;
@@ -90,17 +92,21 @@ userSchema.pre('save', async function (next) {
 
 userSchema.post('save', function(error, doc, next) {
     if (error.name === 'MongoError' && error.code === 11000) {
-        return next(new Error('User already exist.'));
+        return next(new BadRequest('User already exist'));
     }
     
     next(error);
 });
 
 userSchema.pre('remove', async function (next) {
-    var ObjectId = (require('mongoose').Types.ObjectId);
-
     const user = this;
-    // TODO: Remove events associated with user
+    
+    const events = await Event.find({ members: user._id });
+    events.forEach(async (event) => {
+        event.members.splice(event.members.indexOf(user._id), 1);
+        await event.save();
+    });
+
     next();
 })
 

@@ -4,7 +4,7 @@ const { auth } = require('../middleware/index');
 const { User } = require('../models/user');
 const { Event } = require('../models/event');
 const { checkSignUp } = require('../external/switcher-api-facade');
-const user = require('../models/user');
+const { responseException, BadRequest, NotFoundError } = require('./common/index');
 
 const router = new express.Router();
 
@@ -26,7 +26,7 @@ router.post('/user/signup', [
 
         res.status(201).send({ user, jwt });
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -44,7 +44,7 @@ router.post('/user/login', [
         const jwt = await user.generateAuthToken();
         res.send({ user, jwt });
     } catch (e) {
-        res.status(401).send({ error: 'Invalid email/password' });
+        responseException(res, e, 500);
     }
 })
 
@@ -53,11 +53,11 @@ router.post('/user/event/join', auth, async (req, res) => {
         const event = await Event.findOne({ _id: req.body.eventid });
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
         if (event.members.includes(req.user._id)) {
-            return res.status(400).send({ error: 'User already joined' });
+            throw new BadRequest('User already joined');
         }
 
         event.members.push(req.user._id);
@@ -67,7 +67,7 @@ router.post('/user/event/join', auth, async (req, res) => {
         await req.user.save();
         res.send(req.user);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -77,7 +77,7 @@ router.post('/user/event/dismiss', auth, async (req, res) => {
         await req.user.save();
         res.send(req.user);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 
@@ -86,14 +86,14 @@ router.post('/user/event/leave', auth, async (req, res) => {
         const event = await Event.findOne({ _id: req.body.eventid });
 
         if (!event) {
-            return res.status(404).send();
+            throw new NotFoundError('event');
         }
 
         event.members.splice(event.members.indexOf(req.user._id), 1);
         await event.save();
         res.send(event);
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 

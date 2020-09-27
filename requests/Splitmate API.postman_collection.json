@@ -606,13 +606,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/add/item",
+					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/add/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5f6fb13540a0eb38f835b171",
+						"5f711ca6ddb28852d418352e",
 						"add",
 						"item"
 					]
@@ -637,7 +637,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -645,13 +645,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/delete/item",
+					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/delete/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5f6fb13540a0eb38f835b171",
+						"5f711ca6ddb28852d418352e",
 						"delete",
 						"item"
 					]
@@ -676,7 +676,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -684,13 +684,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/pick/item",
+					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/pick/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5f6fb13540a0eb38f835b171",
+						"5f711ca6ddb28852d418352e",
 						"pick",
 						"item"
 					]
@@ -715,7 +715,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"item\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -723,13 +723,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6fb13540a0eb38f835b171/unpick/item",
+					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/unpick/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5f6fb13540a0eb38f835b171",
+						"5f711ca6ddb28852d418352e",
 						"unpick",
 						"item"
 					]
@@ -762,13 +762,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6f8e86e1ade748985970a1",
+					"raw": "{{url}}/event/5f711ca6ddb28852d418352e",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5f6f8e86e1ade748985970a1"
+						"5f711ca6ddb28852d418352e"
 					]
 				}
 			},
