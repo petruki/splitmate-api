@@ -41,13 +41,17 @@ router.post('/event/invite/:id', auth, async (req, res) => {
         }
 
         if (!user) {
-            await checkSendMail();
+            await checkSendMail('invite');
             sendInvite(req.body.email, event.name);
             const userInvite = new UserInvite({ email: req.body.email, eventid: event._id });
             await userInvite.save();
         } else {
-            if (user.events_pending.length && user.events_pending.includes(event._id)) {
-                throw new Error('User already invited');
+            if (!event.members.includes(user._id)) {
+                if (user.events_pending.length && user.events_pending.includes(event._id)) {
+                    throw new Error('User already invited');
+                }
+            } else {
+                throw new Error('User already joined');
             }
     
             user.events_pending.push(event._id);
@@ -62,7 +66,7 @@ router.post('/event/invite/:id', auth, async (req, res) => {
 
 router.post('/event/reminder/:id', auth, async (req, res) => {
     try {
-        await checkSendMail();
+        await checkSendMail('reminder');
         const event = await Event.findById(req.params.id);
 
         if (!event) {
@@ -90,7 +94,7 @@ router.post('/event/reminder/:id', auth, async (req, res) => {
 router.patch('/event/:id', auth, [
     check('name').isLength({ min: 2, max: 100 }),
     check('description').isLength({ max: 5000 }),
-    check('location').isLength({ max: 500 }),
+    check('location').isLength({ max: 500 })
 ], verifyInputUpdateParameters(['name', 'description', 'date', 'location']
 ), async (req, res) => {
     try {
@@ -116,46 +120,38 @@ router.patch('/event/:id/:action/item', auth, async (req, res) => {
             return res.status(404).send();
         }
 
+        if (!req.body.item) {
+            throw new Error(`'item' name must be specified`);
+        }
+
         switch (req.params.action) {
             case 'add':
                 const item = new Item(req.body);
                 event.items.push(item);
                 break;
             case 'pick':
-                if (!req.body.item) {
-                    throw new Error(`'item' name must be specified`);
-                }
-
                 event.items.forEach(item => {
-                    if (item.name === req.body.item) {
+                    if (item.name === req.body.item)
                         item.assigned_to = req.user._id;
-                    }
-                })
+                });
                 break;
             case 'unpick':
-                if (!req.body.item) {
-                    throw new Error(`'item' name must be specified`);
-                }
-
                 event.items.forEach(item => {
-                    if (item.name === req.body.item && String(item.assigned_to) === String(req.user._id)) {
+                    if (item.name === req.body.item && 
+                        String(item.assigned_to) === String(req.user._id))
                         item.assigned_to = undefined;
-                    }
-                })
+                });
                 break;
             break;
             case 'delete':
-                if (!req.body.item) {
-                    throw new Error(`'item' name must be specified`);
-                }
-
                 const itemToDelete = event.items.filter(item => item.name === req.body.item);
                 if (itemToDelete.length)
                     event.items.splice(event.items.indexOf(itemToDelete), 1);
                 break;
             break;
             default:
-                throw new Error('Invalid operation');
+                throw new Error(
+                    `Invalid operation '${req.params.action}' - try [add, pick, unpick, delete]`);
         }
         
         await event.save();

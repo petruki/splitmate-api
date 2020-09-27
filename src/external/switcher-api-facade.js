@@ -28,10 +28,11 @@ async function checkSignUp(email) {
     }
 }
 
-async function checkSendMail() {
+async function checkSendMail(action) {
     await initSwitcher();
 
-    if (!await switcher.isItOn('SENDMAIL')) {
+    if (!await switcher.isItOn('SENDMAIL', [
+        Switcher.StrategiesType.VALUE, action])) {
         throw new Error(`Send email is not available`);  
     }
 }

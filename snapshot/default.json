@@ -31,11 +31,21 @@
                         {
                             "key": "SENDMAIL",
                             "activated": false,
-                            "strategies": [],
+                            "strategies": [
+                              {
+                                "strategy": "VALUE_VALIDATION",
+                                "activated": true,
+                                "operation": "EXIST",
+                                "values": [
+                                  "invite",
+                                  "reminder"
+                                ]
+                              }
+                            ],
                             "components": [
-                                "splitmate-api"
+                              "splitmate-api"
                             ]
-                        }
+                          }
                     ]
                 }
             ]
