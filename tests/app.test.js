@@ -4,7 +4,6 @@ const request = require('supertest');
 const Switcher = require('switcher-client');
 
 afterAll(async () => {
-  await new Promise(resolve => setTimeout(resolve, 2000));
   await mongoose.disconnect();
 })
 
@@ -16,6 +15,6 @@ describe('Test APP', () => {
       .send().expect(200).then(() => {
         done();
       });
-  })
+  }, 30000)
 
 })
