@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+  - "10"
+
+jobs:
+  include:
+    - stage: compile
+      script:
+        - npm install
+    - stage: test
+      script:
+        - npm test
+    - stage: deploy
+      script:
+        - echo "Ready to deploy..."
+
+stages:
+  - compile
+  - test
