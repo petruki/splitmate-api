@@ -6,6 +6,50 @@
 	},
 	"item": [
 		{
+			"name": "Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5ccae448-76c5-4e02-ac41-f547e6dd1f7e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/check",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"check"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User - Sign Up",
 			"event": [
 				{

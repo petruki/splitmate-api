@@ -14,7 +14,8 @@ async function initSwitcher() {
         switcher = new Switcher(url, apiKey, domainName, component, environment, 
             { snapshotLocation: 'snapshot/', offline });
     
-        await switcher.loadSnapshot();
+        if (offline)
+            await switcher.loadSnapshot();
     }
 }
 
