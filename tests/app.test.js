@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const request = require('supertest');
 const Switcher = require('switcher-client');
 
-afterAll(async () => { 
+afterAll(async () => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
   await mongoose.disconnect();
 })
 

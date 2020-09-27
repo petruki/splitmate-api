@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Rice-Beans/splitmate-api.svg?branch=master)](https://travis-ci.com/Rice-Beans/splitmate-api)
+
 # Requirements  
 - NodeJS
 - MongoDB

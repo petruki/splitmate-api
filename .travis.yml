@@ -10,6 +10,13 @@ jobs:
     - stage: test
       script:
         - npm test
+    - stage: deploy
+      script:
+        - echo "Ready to deploy..."
+      deploy:
+        provider: heroku
+        app: splitmate-api-demo
+        api_key: ${HEROKU_KEY}
 
 stages:
   - compile
