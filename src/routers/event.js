@@ -38,8 +38,15 @@ router.post('/event/create', [
 
 router.post('/event/invite/:id', auth, async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
-        const event = await Event.findById(req.params.id);
+        let user, event;
+
+        await Promise.all([
+            User.findOne({ email: req.body.email }), 
+            Event.findById(req.params.id)
+        ]).then(result => {
+            user = result[0];
+            event = result[1];
+        });
 
         if (!event) {
             throw new NotFoundError('event');
@@ -126,7 +133,7 @@ router.patch('/event/:id/:action/item', auth, async (req, res) => {
         }
 
         if (!req.body.name) {
-            throw new BadRequest(`'name' name must be specified`);
+            throw new BadRequest(`'name' must be specified`);
         }
 
         switch (req.params.action) {
@@ -189,22 +196,22 @@ router.delete('/event/:id', auth, async (req, res) => {
 
 router.get('/event', auth, async (req, res) => {
     try {
-        let myEvent, invitedEvents;
+        let organizer, member;
 
         await Promise.all([
             Event.find({ organizer: req.user._id }), 
             Event.find({ members: req.user._id })
         ]).then(result => {
-            myEvent = result[0];
-            invitedEvents = result[1];
+            organizer = result[0];
+            member = result[1];
         });
 
         res.send({
-            organizing: myEvent,
-            joined: invitedEvents
+            organizer,
+            member
         });
     } catch (e) {
-        res.status(500).send({ error: e.message });
+        responseException(res, e, 500);
     }
 })
 

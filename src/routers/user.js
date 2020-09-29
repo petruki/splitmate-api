@@ -107,17 +107,18 @@ router.get('/user/me', auth, async (req, res) => {
     res.send(req.user);
 })
 
-router.get('/user/find', auth, async (req, res) => {
-    let users = [];
-    if (req.query.username.length && req.query.username.length > 2) {
-        const foundUsers = await User.find({ username: req.query.username });
-        users.push(foundUsers.map(u => {
-            return {
-                id: u._id,
-                username: u.username
-            }
-        }));
+router.get('/user/find', [check('username').isLength({ min: 2 })], 
+    auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
     }
+
+    let users = await User
+        .find({ username: req.query.username })
+        .select('_id username name')
+        .lean();
+
     res.send(users);
 })
 
