@@ -5,12 +5,15 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String
+    },
+    value: {
+        type: Number
+    },
     individual: {
         type: Boolean,
         default: false
-    },
-    type: {
-        type: String
     },
     created_by: {
         type: mongoose.Schema.Types.ObjectId,
