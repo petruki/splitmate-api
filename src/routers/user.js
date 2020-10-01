@@ -98,13 +98,22 @@ router.post('/user/event/leave', auth, async (req, res) => {
 })
 
 router.post('/user/logout', auth, async (req, res) => {
-    req.user.token = null;
-    await req.user.save();
-    res.send({ message: 'Success' });
+    try {
+        req.user.token = null;
+        await req.user.save();
+        res.send({ message: 'Success' });
+    } catch (e) {
+        responseException(res, e, 500);
+    }
 })
 
 router.get('/user/me', auth, async (req, res) => {
-    res.send(req.user);
+    try {
+        res.send(req.user);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+
 })
 
 router.get('/user/find', [check('username').isLength({ min: 2 })], 
@@ -123,8 +132,12 @@ router.get('/user/find', [check('username').isLength({ min: 2 })],
 })
 
 router.delete('/user/me', auth, async (req, res) => {
-    await req.user.remove();
-    res.send({ message: 'User removed' });
+    try {
+        await req.user.remove();
+        res.send({ message: 'User removed' });
+    } catch (e) {
+        responseException(res, e, 500);
+    }
 })
 
 module.exports = router;
