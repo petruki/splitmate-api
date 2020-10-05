@@ -160,7 +160,9 @@ router.patch('/event/:id/:action/item', auth, async (req, res) => {
                 const itemToDelete = event.items.filter(item => item.name === req.body.name);
                 if (itemToDelete.length) {
                     if (String(itemToDelete[0].created_by) === String(req.user._id)) {
-                        event.items.splice(event.items.indexOf(itemToDelete[0]), 1);
+                        const elementPos = event.items.indexOf(itemToDelete[0]);
+                        if (elementPos >= 0)
+                            event.items.splice(elementPos, 1);
                     } else {
                         throw new BadRequest('Unable to delete this item');
                     }

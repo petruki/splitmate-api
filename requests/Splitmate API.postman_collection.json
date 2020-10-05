@@ -349,7 +349,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -357,7 +357,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/join",
+					"raw": "{{url}}/user/event/join?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
@@ -365,6 +365,12 @@
 						"user",
 						"event",
 						"join"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5f6f8fb71dcdf429d8dc4bbf"
+						}
 					]
 				}
 			},
@@ -399,7 +405,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -407,7 +413,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/leave",
+					"raw": "{{url}}/user/event/leave?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
@@ -415,6 +421,12 @@
 						"user",
 						"event",
 						"leave"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5f6f8fb71dcdf429d8dc4bbf"
+						}
 					]
 				}
 			},
@@ -449,7 +461,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"eventid\": \"5f6f8fb71dcdf429d8dc4bbf\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -457,7 +469,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/dismiss",
+					"raw": "{{url}}/user/event/dismiss?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
@@ -465,6 +477,12 @@
 						"user",
 						"event",
 						"dismiss"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5f6f8fb71dcdf429d8dc4bbf"
+						}
 					]
 				}
 			},

@@ -19,7 +19,8 @@
                                     "operation": "EXIST",
                                     "values": [
                                         "roger.petruki@gmail.com",
-                                        "mail@mail.com"
+                                        "mail@mail.com",
+                                        "test@mail.com"
                                     ]
                                 }
                             ],

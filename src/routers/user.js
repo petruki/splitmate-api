@@ -48,9 +48,15 @@ router.post('/user/login', [
     }
 })
 
-router.post('/user/event/join', auth, async (req, res) => {
+router.post('/user/event/join', [check('eventid').isMongoId()],
+    auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.body.eventid });
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
+        const event = await Event.findOne({ _id: req.query.eventid });
 
         if (!event) {
             throw new NotFoundError('event');
@@ -60,11 +66,15 @@ router.post('/user/event/join', auth, async (req, res) => {
             throw new BadRequest('User already joined');
         }
 
-        event.members.push(req.user._id);
-        req.user.events_pending.splice(req.user.events_pending.indexOf(req.body.eventid), 1);
+        const elementPos = req.user.events_pending.indexOf(req.query.eventid);
 
-        await event.save();
-        await req.user.save();
+        if (elementPos >= 0) {
+            event.members.push(req.user._id);
+            req.user.events_pending.splice(req.user.events_pending.indexOf(req.query.eventid), 1);
+    
+            await event.save();
+            await req.user.save();
+        }
         res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
@@ -73,8 +83,12 @@ router.post('/user/event/join', auth, async (req, res) => {
 
 router.post('/user/event/dismiss', auth, async (req, res) => {
     try {
-        req.user.events_pending.splice(req.user.events_pending.indexOf(req.body.eventid), 1);
-        await req.user.save();
+        const elementPos = req.user.events_pending.indexOf(req.query.eventid);
+
+        if (elementPos >= 0) {
+            req.user.events_pending.splice(elementPos, 1);
+            await req.user.save();
+        }
         res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
@@ -83,15 +97,19 @@ router.post('/user/event/dismiss', auth, async (req, res) => {
 
 router.post('/user/event/leave', auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.body.eventid });
+        const event = await Event.findOne({ _id: req.query.eventid });
 
         if (!event) {
             throw new NotFoundError('event');
         }
 
-        event.members.splice(event.members.indexOf(req.user._id), 1);
-        await event.save();
-        res.send(event);
+        const elementPos = event.members.indexOf(req.user._id);
+
+        if (elementPos >= 0) {
+            event.members.splice(event.members.indexOf(req.user._id), 1);
+            await event.save();
+        }
+        res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
     }
