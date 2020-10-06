@@ -198,19 +198,19 @@ router.delete('/event/:id', auth, async (req, res) => {
 
 router.get('/event', auth, async (req, res) => {
     try {
-        let organizer, member;
+        let organizer_of, member_of;
 
         await Promise.all([
             Event.find({ organizer: req.user._id }), 
             Event.find({ members: req.user._id })
         ]).then(result => {
-            organizer = result[0];
-            member = result[1];
+            organizer_of = result[0];
+            member_of = result[1];
         });
 
         res.send({
-            organizer,
-            member
+            organizer_of,
+            member_of
         });
     } catch (e) {
         responseException(res, e, 500);
