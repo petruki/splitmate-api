@@ -10,12 +10,15 @@ let switcher;
 
 async function initSwitcher() {
     if (!switcher) {
-        console.log('Loading Switcher snapshot');
         switcher = new Switcher(url, apiKey, domainName, component, environment, 
             { snapshotLocation: 'snapshot/', offline });
     
-        if (offline)
+        if (offline) {
+            console.log('Loading Switcher snapshot...');
             await switcher.loadSnapshot();
+            console.log('Snapshot loaded');
+        }
+            
     }
 }
 
