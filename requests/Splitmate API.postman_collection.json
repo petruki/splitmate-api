@@ -832,6 +832,46 @@
 			"response": []
 		},
 		{
+			"name": "Event - Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f7a82055f4ddb4c40e8d9df",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f7a82055f4ddb4c40e8d9df"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Event - Edit",
 			"request": {
 				"auth": {
