@@ -31,7 +31,10 @@ const eventSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    items: [itemSchema]
+    items: [itemSchema],
+    version: {
+        type: String
+    }
 });
 
 eventSchema.virtual('v_members', {
@@ -49,6 +52,7 @@ eventSchema.pre('save', async function (next) {
         throw new Error('Duplicated items found');
     }
 
+    event.version = Date.now().toString();
     next();
 })
 
