@@ -217,4 +217,18 @@ router.get('/event', auth, async (req, res) => {
     }
 })
 
+router.get('/event/:id', auth, [check('id').isMongoId()], async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            throw new NotFoundError('event');
+        }
+        
+        res.send(event);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
 module.exports = router;
