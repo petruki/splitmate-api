@@ -43,6 +43,31 @@ eventSchema.virtual('v_members', {
     foreignField: '_id'
 });
 
+eventSchema.virtual('v_organizer', {
+    ref: 'User',
+    localField: 'organizer',
+    foreignField: '_id'
+});
+
+eventSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret) {
+        delete ret.id;
+        
+        if (ret.v_members) {
+            ret.v_members.forEach(member => delete member.id)
+        }
+
+        if (ret.v_organizer) {
+            ret.v_organizer.forEach(organizer => delete organizer.id)
+        }
+        
+        return ret;
+    }
+};
+
 eventSchema.pre('save', async function (next) {
     const event = this;
     let duplicated = 0;

@@ -48,7 +48,7 @@ router.post('/user/login', [
     }
 })
 
-router.post('/user/event/join', [check('eventid').isMongoId()],
+router.post('/user/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -81,8 +81,14 @@ router.post('/user/event/join', [check('eventid').isMongoId()],
     }
 })
 
-router.post('/user/event/dismiss', auth, async (req, res) => {
+router.post('/user/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const elementPos = req.user.events_pending.indexOf(req.query.eventid);
 
         if (elementPos >= 0) {
@@ -95,8 +101,14 @@ router.post('/user/event/dismiss', auth, async (req, res) => {
     }
 })
 
-router.post('/user/event/leave', auth, async (req, res) => {
+router.post('/user/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const event = await Event.findOne({ _id: req.query.eventid });
 
         if (!event) {

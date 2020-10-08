@@ -12,10 +12,10 @@ const { responseException, BadRequest, NotFoundError, PermissionError } = requir
 const router = new express.Router();
 
 router.post('/event/create', [
-    check('name').isLength({ min: 2, max: 100 }),
-    check('description').isLength({ max: 5000 }),
-    check('location').isLength({ max: 500 }),
-    check('organizer').isMongoId()
+    check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
+    check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
+    check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 }),
+    check('organizer', 'organizer must be a valid Id').isMongoId()
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -104,12 +104,17 @@ router.post('/event/reminder/:id', auth, async (req, res) => {
 })
 
 router.patch('/event/:id', auth, [
-    check('name').isLength({ min: 2, max: 100 }),
-    check('description').isLength({ max: 5000 }),
-    check('location').isLength({ max: 500 })
+    check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
+    check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
+    check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
 ], verifyInputUpdateParameters(['name', 'description', 'date', 'location']
 ), async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const event = await Event.findById(req.params.id);
 
         if (!event) {
@@ -124,8 +129,14 @@ router.patch('/event/:id', auth, [
     }
 })
 
-router.patch('/event/:id/:action/item', auth, async (req, res) => {
+router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const event = await Event.findById(req.params.id);
 
         if (!event) {
@@ -181,8 +192,14 @@ router.patch('/event/:id/:action/item', auth, async (req, res) => {
     }
 })
 
-router.delete('/event/:id', auth, async (req, res) => {
+router.delete('/event/:id', [check('id', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
 
         if (!event) {
@@ -217,14 +234,22 @@ router.get('/event', auth, async (req, res) => {
     }
 })
 
-router.get('/event/:id', auth, [check('id').isMongoId()], async (req, res) => {
+router.get('/event/:id', [check('id', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        
         const event = await Event.findById(req.params.id);
 
         if (!event) {
             throw new NotFoundError('event');
         }
         
+        await event.populate({ path: 'v_members', select: '-_id name username email' }).execPopulate();
+        await event.populate({ path: 'v_organizer', select: '-_id name username email' }).execPopulate();
         res.send(event);
     } catch (e) {
         responseException(res, e, 500);
