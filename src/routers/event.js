@@ -14,8 +14,7 @@ const router = new express.Router();
 router.post('/event/create', [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
-    check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 }),
-    check('organizer', 'organizer must be a valid Id').isMongoId()
+    check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -24,12 +23,13 @@ router.post('/event/create', [
 
     try {
         const event = new Event(req.body);
-        if (event.items.length)
-            event.items.forEach(item => item.created_by = req.user._id);
+        event.organizer = req.user._id;
         event.members.push(req.user._id);
         
+        if (event.items.length)
+            event.items.forEach(item => item.created_by = req.user._id);
+        
         await event.save();
-
         res.status(201).send(event);
     } catch (e) {
         responseException(res, e, 500);
