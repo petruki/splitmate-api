@@ -433,6 +433,120 @@
 			"response": []
 		},
 		{
+			"name": "User - Add Archive Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d8e01892-a8d2-4fc2-bdc6-636fdefa663c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/add/archive?eventid=5f7a82055f4ddb4c40e8d9df",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"add",
+						"archive"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5f7a82055f4ddb4c40e8d9df"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Remove Archive Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5d6f4318-1d8c-4197-9cce-5f39a7f054aa",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/remove/archive?eventid=5f7a82055f4ddb4c40e8d9df",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"remove",
+						"archive"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5f7a82055f4ddb4c40e8d9df"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User - Dismiss Event Invitation",
 			"event": [
 				{
