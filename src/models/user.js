@@ -33,12 +33,22 @@ const userSchema = new mongoose.Schema({
     events_pending: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event'
+    }],
+    events_archived: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event'
     }]
 });
 
 userSchema.virtual('v_events_pending', {
     ref: 'Event',
     localField: 'events_pending',
+    foreignField: '_id'
+});
+
+userSchema.virtual('v_events_archived', {
+    ref: 'Event',
+    localField: 'events_archived',
     foreignField: '_id'
 });
 

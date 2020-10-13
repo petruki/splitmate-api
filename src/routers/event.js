@@ -215,19 +215,19 @@ router.delete('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
 
 router.get('/event', auth, async (req, res) => {
     try {
-        let organizer_of, member_of;
+        let current_events, archived_events;
 
         await Promise.all([
-            Event.find({ organizer: req.user._id }), 
-            Event.find({ members: req.user._id })
+            Event.find({ organizer: req.user._id, _id: { $nin: req.user.events_archived } }), 
+            Event.find({ _id: req.user.events_archived })
         ]).then(result => {
-            organizer_of = result[0];
-            member_of = result[1];
+            current_events = result[0];
+            archived_events = result[1];
         });
 
         res.send({
-            organizer_of,
-            member_of
+            current_events,
+            archived_events
         });
     } catch (e) {
         responseException(res, e, 500);

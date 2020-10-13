@@ -115,12 +115,49 @@ router.post('/user/event/leave', [check('eventid', 'Invalid Event Id').isMongoId
             throw new NotFoundError('event');
         }
 
-        const elementPos = event.members.indexOf(req.user._id);
-
+        let elementPos = event.members.indexOf(req.user._id);
         if (elementPos >= 0) {
+            //Remove member from group
             event.members.splice(event.members.indexOf(req.user._id), 1);
             await event.save();
+
+            elementPos = req.user.events_archived.indexOf(req.query.eventid);
+            if (elementPos >= 0) {
+                //Remove event from archive if exists
+                req.user.events_archived.splice(elementPos, 1);
+                await req.user.save();
+            }
         }
+        res.send(req.user);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.post('/user/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
+    auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
+        const elementPos = req.user.events_archived.indexOf(req.query.eventid);
+
+        if (req.params.action === 'add') {
+            if (elementPos < 0) {
+                req.user.events_archived.push(req.query.eventid);
+                await req.user.save();
+            }
+        } else if (req.params.action === 'remove') {
+            if (elementPos >= 0) {
+                req.user.events_archived.splice(elementPos, 1);
+                await req.user.save();
+            }
+        } else {
+            throw new BadRequest(`Command '${req.params.action}' does not exist - try [add, remove]`);
+        }
+        
         res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
