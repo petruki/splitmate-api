@@ -11,6 +11,25 @@ const { responseException, BadRequest, NotFoundError, PermissionError } = requir
 
 const router = new express.Router();
 
+async function inviteMember(user, event, email) {
+    if (!user) { // User not registered to the API
+        await checkSendMail('invite');
+        sendInvite(email, event.name);
+        const userInvite = new UserInvite({ email: email, eventid: event._id });
+        await userInvite.save();
+    } else {
+        if (!event.members.includes(user._id)) { // User already joined
+            if (user.events_pending.length && 
+                user.events_pending.includes(event._id)) { // User is pending to awnser
+                throw new BadRequest('User already invited');
+            }
+        }
+
+        user.events_pending.push(event._id);
+        await user.save();
+    }
+}
+
 router.post('/event/create', [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
@@ -41,7 +60,7 @@ router.post('/event/invite/:id', auth, async (req, res) => {
         let user, event;
 
         await Promise.all([
-            User.findOne({ email: req.body.email }), 
+            User.findOne({ $or: [{ email: req.body.email }, { username: req.body.username }] }),
             Event.findById(req.params.id)
         ]).then(result => {
             user = result[0];
@@ -52,24 +71,28 @@ router.post('/event/invite/:id', auth, async (req, res) => {
             throw new NotFoundError('event');
         }
 
-        if (!user) {
-            await checkSendMail('invite');
-            sendInvite(req.body.email, event.name);
-            const userInvite = new UserInvite({ email: req.body.email, eventid: event._id });
-            await userInvite.save();
-        } else {
-            if (!event.members.includes(user._id)) {
-                if (user.events_pending.length && user.events_pending.includes(event._id)) {
-                    throw new BadRequest('User already invited');
-                }
-            } else {
-                throw new BadRequest('User already joined');
-            }
-    
-            user.events_pending.push(event._id);
-            await user.save();
+        await inviteMember(user, event, req.body.email);
+
+        res.send({ message: 'Invitation has been sent' });
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.post('/event/invite_all/:id', auth, async (req, res) => {
+    try {
+        let event = await Event.findById(req.params.id);
+
+        if (!event) {
+            throw new NotFoundError('event');
         }
 
+        let user;
+        for (let i = 0; i < req.body.emails.length; i++) {
+            user = await User.findOne({ email: req.body.emails[i] });
+            await inviteMember(user, event, req.body.emails[i]);
+        }
+        
         res.send({ message: 'Invitation has been sent' });
     } catch (e) {
         responseException(res, e, 500);

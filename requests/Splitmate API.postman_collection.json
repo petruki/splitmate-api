@@ -1047,14 +1047,52 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/invite/5f6f8fb71dcdf429d8dc4bbf",
+					"raw": "{{url}}/event/invite/5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
 						"invite",
-						"5f6f8fb71dcdf429d8dc4bbf"
+						"5f7a82055f4ddb4c40e8d9df"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Invite All",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"emails\": [\r\n        \"mail@mail.com\",\r\n        \"test@mail.com\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/invite_all/5f7a82055f4ddb4c40e8d9df",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"invite_all",
+						"5f7a82055f4ddb4c40e8d9df"
 					]
 				}
 			},
