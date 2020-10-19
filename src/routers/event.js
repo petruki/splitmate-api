@@ -12,15 +12,18 @@ const { responseException, BadRequest, NotFoundError, PermissionError } = requir
 const router = new express.Router();
 
 async function inviteMember(user, event, email) {
-    if (!user) { // User not registered to the API
+    // User not registered to the API
+    if (!user) { 
         await checkSendMail('invite');
         sendInvite(email, event.name);
         const userInvite = new UserInvite({ email: email, eventid: event._id });
         await userInvite.save();
     } else {
-        if (!event.members.includes(user._id)) { // User already joined
+        // User already joined
+        if (!event.members.includes(user._id)) {
+            // User is pending to awnser
             if (user.events_pending.length && 
-                user.events_pending.includes(event._id)) { // User is pending to awnser
+                user.events_pending.includes(event._id)) {
                 throw new BadRequest('User already invited');
             }
         }
