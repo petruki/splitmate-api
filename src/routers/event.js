@@ -239,22 +239,31 @@ router.delete('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
     }
 })
 
-router.get('/event', auth, async (req, res) => {
+router.get('/my_events/:category', auth, async (req, res) => {
     try {
-        let current_events, archived_events;
+        let events;
 
-        await Promise.all([
-            Event.find({ organizer: req.user._id, _id: { $nin: req.user.events_archived } }), 
-            Event.find({ _id: req.user.events_archived })
-        ]).then(result => {
-            current_events = result[0];
-            archived_events = result[1];
-        });
+        switch (req.params.category) {
+            case 'current':
+                events = await Event
+                    .find({ organizer: req.user._id, _id: { $nin: req.user.events_archived } })
+                    .select('-items -members');
+                break;
+            case 'archived':
+                events = await Event
+                    .find({ _id: req.user.events_archived })
+                    .select('-items -members');
+                break;
+            case 'invited':
+                events = await Event
+                    .find({ _id: req.user.events_pending })
+                    .select('-items -members')
+                break;
+            default:
+                throw new BadRequest('Event category not valid');
+        }
 
-        res.send({
-            current_events,
-            archived_events
-        });
+        res.send(events);
     } catch (e) {
         responseException(res, e, 500);
     }

@@ -907,7 +907,7 @@
 			"response": []
 		},
 		{
-			"name": "Event - My Events",
+			"name": "Event - My Events (Current)",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -934,12 +934,93 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event",
+					"raw": "{{url}}/my_events/current",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"event"
+						"my_events",
+						"current"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - My Events (Archived)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/my_events/archived",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"my_events",
+						"archived"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - My Events (Invited)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/my_events/invited",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"my_events",
+						"invited"
 					]
 				}
 			},
