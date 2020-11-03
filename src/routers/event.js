@@ -283,9 +283,55 @@ router.get('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
             throw new NotFoundError('event');
         }
         
-        await event.populate({ path: 'v_members', select: '-_id name username email' }).execPopulate();
-        await event.populate({ path: 'v_organizer', select: '-_id name username email' }).execPopulate();
+        await event.populate({ path: 'v_members', select: 'name username email' }).execPopulate();
+        await event.populate({ path: 'v_organizer', select: 'name username email' }).execPopulate();
         res.send(event);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.get('/event/:eventid/item/:id', [
+    check('eventid', 'Invalid Event Id').isMongoId(),
+    check('id', 'Invalid Item Id').isMongoId()], 
+    auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        
+        const event = 
+            await Event
+                .findById(req.params.eventid)
+                .populate({
+                    path: 'items',
+                    model: 'Item',
+                    populate: {
+                        path: 'v_created_by',
+                        model: 'User',
+                        select: 'name username'
+                    }
+                })
+                .populate({
+                    path: 'items',
+                    model: 'Item',
+                    populate: {
+                        path: 'v_assigned_to',
+                        model: 'User',
+                        select: 'name username'
+                    }
+                }).lean();
+
+        if (!event) {
+            throw new NotFoundError('event');
+        }
+
+        const item = event.items.filter(item => item._id = req.params.id);
+        item[0].v_created_by = item[0].v_created_by[0];
+        item[0].v_assigned_to = item[0].v_assigned_to[0];
+        
+        res.send(item[0]);
     } catch (e) {
         responseException(res, e, 500);
     }
