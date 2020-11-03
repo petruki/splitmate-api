@@ -1067,6 +1067,48 @@
 			"response": []
 		},
 		{
+			"name": "Event - Get Item",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5f7a82055f4ddb4c40e8d9df/item/5f7e21f74994384058e24cfb",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5f7a82055f4ddb4c40e8d9df",
+						"item",
+						"5f7e21f74994384058e24cfb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Event - Edit",
 			"request": {
 				"auth": {
