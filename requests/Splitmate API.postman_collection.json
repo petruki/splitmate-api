@@ -831,6 +831,45 @@
 			"response": []
 		},
 		{
+			"name": "Event - Edit Item",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Beer\",\r\n    \"type\": \"Consumable\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/5fa254e4e6a7874970f02453/edit/item",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"5fa254e4e6a7874970f02453",
+						"edit",
+						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Event - Unpick Items",
 			"request": {
 				"auth": {

@@ -190,12 +190,12 @@ router.get('/user/find', [check('username').isLength({ min: 2 })],
         return res.status(422).json({ errors: errors.array() });
     }
 
-    let users = await User
-        .find({ username: req.query.username })
-        .select('_id username name')
+    let user = await User
+        .findOne({ username: req.query.username })
+        .select('_id username name email')
         .lean();
 
-    res.send(users);
+    res.send(user);
 })
 
 router.delete('/user/me', auth, async (req, res) => {

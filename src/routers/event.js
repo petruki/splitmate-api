@@ -179,6 +179,14 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                 item.created_by = req.user._id;
                 event.items.push(item);
                 break;
+            case 'edit':
+                event.items.forEach(item => {
+                    if (item.name === req.body.name) {
+                        const updates = Object.keys(req.body);
+                        updates.forEach((update) => item[update] = req.body[update]);
+                    }
+                });
+                break;
             case 'pick':
                 event.items.forEach(item => {
                     if (item.name === req.body.name)
@@ -208,7 +216,7 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
             break;
             default:
                 throw new BadRequest(
-                    `Invalid operation '${req.params.action}' - try [add, pick, unpick, delete]`);
+                    `Invalid operation '${req.params.action}' - try [add, edit, pick, unpick, delete]`);
         }
         
         await event.save();
@@ -246,7 +254,7 @@ router.get('/my_events/:category', auth, async (req, res) => {
         switch (req.params.category) {
             case 'current':
                 events = await Event
-                    .find({ organizer: req.user._id, _id: { $nin: req.user.events_archived } })
+                    .find({ members: req.user._id, _id: { $nin: req.user.events_archived } })
                     .select('-items -members');
                 break;
             case 'archived':
