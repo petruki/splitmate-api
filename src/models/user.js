@@ -57,6 +57,9 @@ userSchema.options.toJSON = {
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
+        if (!ret._id)
+            delete ret.id;
+            
         delete ret.password;
         delete ret.token;
         return ret;

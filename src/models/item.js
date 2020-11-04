@@ -28,13 +28,15 @@ const itemSchema = new mongoose.Schema({
 itemSchema.virtual('v_assigned_to', {
     ref: 'User',
     localField: 'assigned_to',
-    foreignField: '_id'
+    foreignField: '_id',
+    justOne : true
 });
 
 itemSchema.virtual('v_created_by', {
     ref: 'User',
     localField: 'created_by',
-    foreignField: '_id'
+    foreignField: '_id',
+    justOne : true
 });
 
 const Item = mongoose.model('Item', itemSchema);

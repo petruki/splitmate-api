@@ -285,14 +285,24 @@ router.get('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
             return res.status(422).json({ errors: errors.array() });
         }
         
-        const event = await Event.findById(req.params.id);
+        const event = 
+            await Event
+                .findById(req.params.id)
+                .populate({
+                    path: 'items',
+                    model: 'Item',
+                    populate: {
+                        path: 'v_assigned_to',
+                        model: 'User',
+                        select: '-_id name username'
+                    }})
+                .populate({ path: 'v_members', select: 'name username email' })
+                .populate({ path: 'v_organizer', select: 'name username email' }).lean();
 
         if (!event) {
             throw new NotFoundError('event');
         }
-        
-        await event.populate({ path: 'v_members', select: 'name username email' }).execPopulate();
-        await event.populate({ path: 'v_organizer', select: 'name username email' }).execPopulate();
+
         res.send(event);
     } catch (e) {
         responseException(res, e, 500);
@@ -335,10 +345,7 @@ router.get('/event/:eventid/item/:id', [
             throw new NotFoundError('event');
         }
 
-        const item = event.items.filter(item => item._id = req.params.id);
-        item[0].v_created_by = item[0].v_created_by[0];
-        item[0].v_assigned_to = item[0].v_assigned_to[0];
-        
+        const item = event.items.filter(item => String(item._id) === String(req.params.id));
         res.send(item[0]);
     } catch (e) {
         responseException(res, e, 500);

@@ -46,7 +46,8 @@ eventSchema.virtual('v_members', {
 eventSchema.virtual('v_organizer', {
     ref: 'User',
     localField: 'organizer',
-    foreignField: '_id'
+    foreignField: '_id',
+    justOne : true
 });
 
 eventSchema.options.toJSON = {
