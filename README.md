@@ -31,3 +31,7 @@
   }
 }
 ```
+
+# How to colaborate
+1. Open an issue describing your contribution
+2. Fork, build, test, and submit your PR
