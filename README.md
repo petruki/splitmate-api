@@ -5,7 +5,6 @@
 # Requirements  
 - NodeJS
 - MongoDB
-- Postman (for testing using samples located at requests/)
 
 # Configuration
 1) npm install
