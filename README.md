@@ -11,7 +11,6 @@
 1) npm install
 2) Add .env-cmdrc file into the project directory.
 
-Example:
 ```
 {
   "dev": {
