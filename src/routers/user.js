@@ -3,6 +3,7 @@ const { check, validationResult } = require('express-validator');
 const { auth } = require('../middleware/index');
 const { User } = require('../models/user');
 const { Event } = require('../models/event');
+const { UserInvite } = require('../models/user-invite');
 const { checkSignUp } = require('../external/switcher-api-facade');
 const { responseException, BadRequest, NotFoundError } = require('./common/index');
 
@@ -67,14 +68,15 @@ router.post('/user/event/join', [check('eventid', 'Invalid Event Id').isMongoId(
         }
 
         const elementPos = req.user.events_pending.indexOf(req.query.eventid);
-
         if (elementPos >= 0) {
-            event.members.push(req.user._id);
             req.user.events_pending.splice(req.user.events_pending.indexOf(req.query.eventid), 1);
-    
-            await event.save();
             await req.user.save();
+        } else {
+            await UserInvite.deleteOne({ eventid: req.query.eventid, email: req.user.email });
         }
+
+        event.members.push(req.user._id);
+        await event.save();
         res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
