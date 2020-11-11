@@ -265,7 +265,16 @@ router.get('/my_events/:category', auth, async (req, res) => {
             case 'invited':
                 events = await Event
                     .find({ _id: req.user.events_pending })
-                    .select('-items -members')
+                    .select('-items -members');
+
+                const fromEmailInvitation = await UserInvite.find({ email: req.user.email });
+                for (let i = 0; i < fromEmailInvitation.length; i++) {
+                    await fromEmailInvitation[i].populate({ 
+                        path: 'v_event',
+                        select: '-items -members'
+                    }).execPopulate();
+                    events.push(fromEmailInvitation[i].v_event);
+                }
                 break;
             default:
                 throw new BadRequest('Event category not valid');
