@@ -169,10 +169,6 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
             throw new NotFoundError('event');
         }
 
-        if (!req.body.name) {
-            throw new BadRequest(`'name' must be specified`);
-        }
-
         switch (req.params.action) {
             case 'add':
                 const item = new Item(req.body);
@@ -181,7 +177,7 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                 break;
             case 'edit':
                 event.items.forEach(item => {
-                    if (item.name === req.body.name) {
+                    if (String(item._id) === String(req.body._id)) {
                         const updates = Object.keys(req.body);
                         updates.forEach((update) => item[update] = req.body[update]);
                     }
@@ -189,20 +185,24 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                 break;
             case 'pick':
                 event.items.forEach(item => {
-                    if (item.name === req.body.name)
-                        item.assigned_to = req.user._id;
+                    if (String(item._id) === String(req.body._id)) {
+                        if (!item.assigned_to)
+                            item.assigned_to = req.user._id;
+                        else
+                            throw new BadRequest('Item already picked. Refresh your Event.');
+                    }
                 });
                 break;
             case 'unpick':
                 event.items.forEach(item => {
-                    if (item.name === req.body.name && 
+                    if (String(item._id) === String(req.body._id) && 
                         String(item.assigned_to) === String(req.user._id))
                         item.assigned_to = undefined;
                 });
                 break;
             break;
             case 'delete':
-                const itemToDelete = event.items.filter(item => item.name === req.body.name);
+                const itemToDelete = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToDelete.length) {
                     if (String(itemToDelete[0].created_by) === String(req.user._id)) {
                         const elementPos = event.items.indexOf(itemToDelete[0]);

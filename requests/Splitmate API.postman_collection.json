@@ -769,7 +769,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"_id\": \"5fab82b13f42d00017b8e1fc\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -808,7 +808,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"_id\": \"5fab82b13f42d00017b8e1fc\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -847,7 +847,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Beer\",\r\n    \"type\": \"Consumable\"\r\n}",
+					"raw": "{\r\n    \"_id\": \"5fab82b13f42d00017b8e1fc\",\r\n    \"name\": \"Burger\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -855,13 +855,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5fa254e4e6a7874970f02453/edit/item",
+					"raw": "{{url}}/event/5fab770ba2d19700173cfdc2/edit/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
-						"5fa254e4e6a7874970f02453",
+						"5fab770ba2d19700173cfdc2",
 						"edit",
 						"item"
 					]
@@ -886,7 +886,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Beer\"\r\n}",
+					"raw": "{\r\n    \"_id\": \"5fab82b13f42d00017b8e1fc\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
