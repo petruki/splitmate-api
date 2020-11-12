@@ -176,29 +176,32 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                 event.items.push(item);
                 break;
             case 'edit':
-                event.items.forEach(item => {
-                    if (String(item._id) === String(req.body._id)) {
-                        const updates = Object.keys(req.body);
-                        updates.forEach((update) => item[update] = req.body[update]);
-                    }
-                });
+                const itemToEdit = event.items.filter(item => String(item._id) === String(req.body._id));
+                if (itemToEdit.length) {
+                    const updates = Object.keys(req.body);
+                    updates.forEach((update) => itemToEdit[0][update] = req.body[update]);
+                } else {
+                    throw new NotFoundError('item');
+                }
                 break;
             case 'pick':
-                event.items.forEach(item => {
-                    if (String(item._id) === String(req.body._id)) {
-                        if (!item.assigned_to)
-                            item.assigned_to = req.user._id;
-                        else
-                            throw new BadRequest('Item already picked. Refresh your Event.');
-                    }
-                });
+                const itemToPick = event.items.filter(item => String(item._id) === String(req.body._id));
+                if (itemToPick.length) {
+                    if (!itemToPick[0].assigned_to)
+                    itemToPick[0].assigned_to = req.user._id;
+                    else
+                        throw new BadRequest('Item already picked. Refresh your Event.');
+                } else {
+                    throw new NotFoundError('item');
+                }
                 break;
             case 'unpick':
-                event.items.forEach(item => {
-                    if (String(item._id) === String(req.body._id) && 
-                        String(item.assigned_to) === String(req.user._id))
-                        item.assigned_to = undefined;
-                });
+                const itemToUnPick = event.items.filter(item => String(item._id) === String(req.body._id));
+                if (itemToUnPick.length) {
+                    itemToUnPick[0].assigned_to = undefined;
+                } else {
+                    throw new NotFoundError('item');
+                }
                 break;
             break;
             case 'delete':
@@ -208,9 +211,9 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                         const elementPos = event.items.indexOf(itemToDelete[0]);
                         if (elementPos >= 0)
                             event.items.splice(elementPos, 1);
-                    } else {
-                        throw new BadRequest('Unable to delete this item');
                     }
+                } else {
+                    throw new NotFoundError('item');
                 }
                 break;
             break;
