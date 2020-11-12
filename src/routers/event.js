@@ -358,6 +358,8 @@ router.get('/event/:eventid/item/:id', [
         }
 
         const item = event.items.filter(item => String(item._id) === String(req.params.id));
+        if (!item.length) throw new NotFoundError('item');
+
         res.send(item[0]);
     } catch (e) {
         responseException(res, e, 500);
