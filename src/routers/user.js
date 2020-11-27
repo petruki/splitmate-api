@@ -9,6 +9,33 @@ const { responseException, BadRequest, NotFoundError } = require('./common/index
 
 const router = new express.Router();
 
+/**
+ * Remove user from Event and unassign items
+ */
+async function removeUser(event, user) {
+    let elementPos = event.members.indexOf(user._id);
+    if (elementPos >= 0) {
+        //Remove member from group
+        event.members.splice(event.members.indexOf(user._id), 1);
+
+        //Unpick items picked by member
+        event.items.map(item => {
+            if (String(item.assigned_to) === String(user._id)) {
+                item.assigned_to = undefined;
+            }
+        });
+
+        await event.save();
+
+        //Remove event from archive if exists
+        elementPos = user.events_archived.indexOf(event._id);
+        if (elementPos >= 0) {
+            user.events_archived.splice(elementPos, 1);
+            await user.save();
+        }
+    }
+}
+
 router.post('/user/signup', [
     check('name').isLength({ min: 2 }),
     check('username').isLength({ min: 2 }),
@@ -117,20 +144,39 @@ router.post('/user/event/leave', [check('eventid', 'Invalid Event Id').isMongoId
             throw new NotFoundError('event');
         }
 
-        let elementPos = event.members.indexOf(req.user._id);
-        if (elementPos >= 0) {
-            //Remove member from group
-            event.members.splice(event.members.indexOf(req.user._id), 1);
-            await event.save();
-
-            elementPos = req.user.events_archived.indexOf(req.query.eventid);
-            if (elementPos >= 0) {
-                //Remove event from archive if exists
-                req.user.events_archived.splice(elementPos, 1);
-                await req.user.save();
-            }
-        }
+        await removeUser(event, req.user);
+        
         res.send(req.user);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.post('/user/event/:user/remove', [
+    check('eventid', 'Invalid Event Id').isMongoId(),
+    check('user', 'Invalid User Id').isMongoId()], 
+    auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
+        const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
+
+        if (!event) {
+            throw new NotFoundError('event');
+        }
+
+        const user = await User.findById(req.params.user);
+
+        if (!user) {
+            throw new NotFoundError('user');
+        }
+
+        await removeUser(event, user);
+
+        res.send(event);
     } catch (e) {
         responseException(res, e, 500);
     }

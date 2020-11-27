@@ -141,7 +141,7 @@ router.patch('/event/:id', auth, [
             return res.status(422).json({ errors: errors.array() });
         }
 
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
 
         if (!event) {
             throw new NotFoundError('event');
@@ -163,7 +163,7 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
             return res.status(422).json({ errors: errors.array() });
         }
 
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
 
         if (!event) {
             throw new NotFoundError('event');

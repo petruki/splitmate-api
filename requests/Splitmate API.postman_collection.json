@@ -433,6 +433,63 @@
 			"response": []
 		},
 		{
+			"name": "User - Remove from Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c82ecbb5-71ba-4754-873a-8f1f88c0f51f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/event/5f7120b845252f3118148886/remove?eventid=5fa254e4e6a7874970f02453",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"event",
+						"5f7120b845252f3118148886",
+						"remove"
+					],
+					"query": [
+						{
+							"key": "eventid",
+							"value": "5fa254e4e6a7874970f02453"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User - Add Archive Event",
 			"event": [
 				{
