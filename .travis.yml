@@ -17,7 +17,7 @@ jobs:
         - echo "Ready to deploy..."
       deploy:
         provider: heroku
-        app: splitmate-api-demo
+        app: splitmate-api
         api_key: ${HEROKU_KEY}
 
 stages:
