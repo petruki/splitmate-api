@@ -1,6 +1,6 @@
-![Splitmate API](https://raw.githubusercontent.com/Rice-Beans/assets/master/splitmate/logo/splitmate.jpg)
+![Splitmate API](https://raw.githubusercontent.com/trackerforce/splitmate-assets/master/logo/sm_logo.png)
 
-[![Build Status](https://travis-ci.com/Rice-Beans/splitmate-api.svg?branch=master)](https://travis-ci.com/Rice-Beans/splitmate-api)
+[![Build Status](https://travis-ci.com/trackerforce/splitmate-api.svg?branch=master)](https://travis-ci.com/trackerforce/splitmate-api)
 
 # Requirements  
 - NodeJS
