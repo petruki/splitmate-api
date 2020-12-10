@@ -1,8 +1,22 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { User } = require('../models/user');
+
+const digestedServerApiKey = crypto.createHash('md5').update(process.env.API_SECRET).digest("hex").toUpperCase();
+
+function validateApiKey(req) {
+    if (process.env.ENV === 'prod') {
+        const digestedApiKey = req.header('X-API-Key');
+        if (digestedApiKey !== digestedServerApiKey) {
+            throw new Error('Invalid API Key');
+        }
+    }
+}
 
 async function auth(req, res, next) {
     try {
+        validateApiKey(req);
+
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -36,5 +50,6 @@ function verifyInputUpdateParameters(allowedUpdates) {
 
 module.exports = {
     auth,
-    verifyInputUpdateParameters
+    verifyInputUpdateParameters,
+    validateApiKey
 }

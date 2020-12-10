@@ -5,16 +5,23 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    type: {
+    details: [{
+        type: {
+            type: String
+        },
+        value: {
+            type: String
+        }
+    }],
+    poll_name: {
         type: String
     },
-    value: {
-        type: Number
-    },
-    individual: {
-        type: Boolean,
-        default: false
-    },
+    poll: [{
+        value: {
+            type: String
+        },
+        votes: []
+    }],
     created_by: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

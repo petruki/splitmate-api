@@ -4,6 +4,11 @@ const jwt = require('jsonwebtoken');
 const { Event } = require('./event');
 const { PermissionError, BadRequest } = require('../routers/common/index');
 
+const PlanType = Object.freeze({
+    FOUNDER: 'FOUNDER',
+    MEMBER: 'MEMBER'
+});
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -26,6 +31,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    plan: {
+        type: String,
+        enum: Object.values(PlanType),
+        required: true,
+        default: PlanType.MEMBER
     },
     token: {
         type: String
@@ -114,11 +125,25 @@ userSchema.post('save', function(error, doc, next) {
 userSchema.pre('remove', async function (next) {
     const user = this;
     
-    const events = await Event.find({ members: user._id });
-    events.forEach(async (event) => {
-        event.members.splice(event.members.indexOf(user._id), 1);
-        await event.save();
-    });
+    let events = await Event.find({ members: user._id });
+    for (let index = 0; index < events.length; index++) {
+        const element = events[index];
+        element.members.splice(element.members.indexOf(user._id), 1);
+        await element.save();
+    }
+
+    events = await Event.find({ organizer: user._id });
+    for (let index = 0; index < events.length; index++) {
+        const element = events[index];
+        const nextOrganizer = element.members.filter(member => member._id !== user._id);
+
+        if (nextOrganizer.length) {
+            element.organizer = nextOrganizer[0];
+            await element.save();
+        } else {
+            await element.remove();
+        }
+    }
 
     next();
 })
@@ -126,5 +151,6 @@ userSchema.pre('remove', async function (next) {
 const User = mongoose.model('User', userSchema);
 
 module.exports = {
-    User
+    User,
+    PlanType
 };

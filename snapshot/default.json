@@ -15,7 +15,7 @@
                             "strategies": [
                                 {
                                     "strategy": "VALUE_VALIDATION",
-                                    "activated": true,
+                                    "activated": false,
                                     "operation": "EXIST",
                                     "values": [
                                         "roger.petruki@gmail.com",

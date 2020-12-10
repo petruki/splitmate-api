@@ -1,6 +1,6 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const { auth } = require('../middleware/index');
+const { auth, validateApiKey } = require('../middleware/index');
 const { User } = require('../models/user');
 const { Event } = require('../models/event');
 const { UserInvite } = require('../models/user-invite');
@@ -36,11 +36,12 @@ async function removeUser(event, user) {
     }
 }
 
-router.post('/user/signup', [
+router.post('/v1/signup', [
     check('name').isLength({ min: 2 }),
     check('username').isLength({ min: 2 }),
     check('email').isEmail(),
-    check('password').isLength({ min: 3 })
+    check('password').isLength({ min: 3 }),
+    check('plan').isEmpty()
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -58,7 +59,7 @@ router.post('/user/signup', [
     }
 })
 
-router.post('/user/login', [
+router.post('/v1/login', [
     check('username').isLength({ min: 3 }),
     check('password').isLength({ min: 3 })
 ], async (req, res) => {
@@ -68,6 +69,8 @@ router.post('/user/login', [
     }
 
     try {
+        validateApiKey(req);
+        
         const user = await User.findByCredentials(req.body.username, req.body.password);
         const jwt = await user.generateAuthToken();
         res.send({ user, jwt });
@@ -76,7 +79,7 @@ router.post('/user/login', [
     }
 })
 
-router.post('/user/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
+router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -110,7 +113,7 @@ router.post('/user/event/join', [check('eventid', 'Invalid Event Id').isMongoId(
     }
 })
 
-router.post('/user/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
+router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -130,7 +133,7 @@ router.post('/user/event/dismiss', [check('eventid', 'Invalid Event Id').isMongo
     }
 })
 
-router.post('/user/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
+router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -152,7 +155,7 @@ router.post('/user/event/leave', [check('eventid', 'Invalid Event Id').isMongoId
     }
 })
 
-router.post('/user/event/:user/remove', [
+router.post('/v1/event/:user/remove', [
     check('eventid', 'Invalid Event Id').isMongoId(),
     check('user', 'Invalid User Id').isMongoId()], 
     auth, async (req, res) => {
@@ -182,7 +185,7 @@ router.post('/user/event/:user/remove', [
     }
 })
 
-router.post('/user/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
+router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -212,7 +215,7 @@ router.post('/user/event/:action/archive', [check('eventid', 'Invalid Event Id')
     }
 })
 
-router.post('/user/logout', auth, async (req, res) => {
+router.post('/v1/logout', auth, async (req, res) => {
     try {
         req.user.token = null;
         await req.user.save();
@@ -222,7 +225,7 @@ router.post('/user/logout', auth, async (req, res) => {
     }
 })
 
-router.get('/user/me', auth, async (req, res) => {
+router.get('/v1/me', auth, async (req, res) => {
     try {
         res.send(req.user);
     } catch (e) {
@@ -231,7 +234,7 @@ router.get('/user/me', auth, async (req, res) => {
 
 })
 
-router.get('/user/find', [check('username').isLength({ min: 2 })], 
+router.get('/v1/find', [check('username').isLength({ min: 2 })], 
     auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -246,7 +249,7 @@ router.get('/user/find', [check('username').isLength({ min: 2 })],
     res.send(user);
 })
 
-router.delete('/user/me', auth, async (req, res) => {
+router.delete('/v1/me', auth, async (req, res) => {
     try {
         await req.user.remove();
         res.send({ message: 'User removed' });

@@ -82,12 +82,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/signup",
+					"raw": "{{url}}/user/v1/signup",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"signup"
 					]
 				}
@@ -127,12 +128,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/login",
+					"raw": "{{url}}/user/v1/login",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"login"
 					]
 				}
@@ -179,12 +181,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/logout",
+					"raw": "{{url}}/user/v1/logout",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"logout"
 					]
 				}
@@ -222,12 +225,13 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/user/me",
+					"raw": "{{url}}/user/v1/me",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"me"
 					]
 				}
@@ -262,12 +266,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/user/me",
+					"raw": "{{url}}/user/v1/me",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"me"
 					]
 				}
@@ -302,12 +307,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/user/find?username=roger",
+					"raw": "{{url}}/user/v1/find?username=roger",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"find"
 					],
 					"query": [
@@ -357,12 +363,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/join?eventid=5f6f8fb71dcdf429d8dc4bbf",
+					"raw": "{{url}}/user/v1/event/join?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"join"
 					],
@@ -413,12 +420,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/leave?eventid=5f6f8fb71dcdf429d8dc4bbf",
+					"raw": "{{url}}/user/v1/event/leave?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"leave"
 					],
@@ -469,12 +477,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/5f7120b845252f3118148886/remove?eventid=5fa254e4e6a7874970f02453",
+					"raw": "{{url}}/user/v1/event/5f7120b845252f3118148886/remove?eventid=5fa254e4e6a7874970f02453",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"5f7120b845252f3118148886",
 						"remove"
@@ -526,12 +535,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/add/archive?eventid=5f7a82055f4ddb4c40e8d9df",
+					"raw": "{{url}}/user/v1/event/add/archive?eventid=5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"add",
 						"archive"
@@ -583,12 +593,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/remove/archive?eventid=5f7a82055f4ddb4c40e8d9df",
+					"raw": "{{url}}/user/v1/event/remove/archive?eventid=5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"remove",
 						"archive"
@@ -640,12 +651,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/user/event/dismiss?eventid=5f6f8fb71dcdf429d8dc4bbf",
+					"raw": "{{url}}/user/v1/event/dismiss?eventid=5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
+						"v1",
 						"event",
 						"dismiss"
 					],
@@ -684,12 +696,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/create",
+					"raw": "{{url}}/event/v1/create",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"create"
 					]
 				}
@@ -721,12 +734,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/create",
+					"raw": "{{url}}/event/v1/create",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"create"
 					]
 				}
@@ -758,12 +772,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/create",
+					"raw": "{{url}}/event/v1/create",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"create"
 					]
 				}
@@ -795,12 +810,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/add/item",
+					"raw": "{{url}}/event/v1/5f711ca6ddb28852d418352e/add/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f711ca6ddb28852d418352e",
 						"add",
 						"item"
@@ -834,12 +850,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/delete/item",
+					"raw": "{{url}}/event/v1/5f711ca6ddb28852d418352e/delete/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f711ca6ddb28852d418352e",
 						"delete",
 						"item"
@@ -873,12 +890,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/pick/item",
+					"raw": "{{url}}/event/v1/5f711ca6ddb28852d418352e/pick/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f711ca6ddb28852d418352e",
 						"pick",
 						"item"
@@ -912,12 +930,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5fab770ba2d19700173cfdc2/edit/item",
+					"raw": "{{url}}/event/v1/5fab770ba2d19700173cfdc2/edit/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5fab770ba2d19700173cfdc2",
 						"edit",
 						"item"
@@ -951,15 +970,56 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f711ca6ddb28852d418352e/unpick/item",
+					"raw": "{{url}}/event/v1/5f711ca6ddb28852d418352e/unpick/item",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f711ca6ddb28852d418352e",
 						"unpick",
 						"item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event - Tranfer Organizer",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/event/v1/transfer/5fa254e4e6a7874970f02453/5f7a81c85f4ddb4c40e8d9de",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"event",
+						"v1",
+						"transfer",
+						"5fa254e4e6a7874970f02453",
+						"5f7a81c85f4ddb4c40e8d9de"
 					]
 				}
 			},
@@ -990,12 +1050,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f711ca6ddb28852d418352e",
+					"raw": "{{url}}/event/v1/5f711ca6ddb28852d418352e",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f711ca6ddb28852d418352e"
 					]
 				}
@@ -1030,11 +1091,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/my_events/current",
+					"raw": "{{url}}/event/v1/my_events/current",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
+						"event",
+						"v1",
 						"my_events",
 						"current"
 					]
@@ -1070,11 +1133,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/my_events/archived",
+					"raw": "{{url}}/event/v1/my_events/archived",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
+						"event",
+						"v1",
 						"my_events",
 						"archived"
 					]
@@ -1110,11 +1175,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/my_events/invited",
+					"raw": "{{url}}/event/v1/my_events/invited",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
+						"event",
+						"v1",
 						"my_events",
 						"invited"
 					]
@@ -1150,12 +1217,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f7a82055f4ddb4c40e8d9df",
+					"raw": "{{url}}/event/v1/5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f7a82055f4ddb4c40e8d9df"
 					]
 				}
@@ -1190,12 +1258,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f7a82055f4ddb4c40e8d9df/item/5f7e21f74994384058e24cfb",
+					"raw": "{{url}}/event/v1/5f7a82055f4ddb4c40e8d9df/item/5f7e21f74994384058e24cfb",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f7a82055f4ddb4c40e8d9df",
 						"item",
 						"5f7e21f74994384058e24cfb"
@@ -1229,12 +1298,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/5f6f8fb71dcdf429d8dc4bbf",
+					"raw": "{{url}}/event/v1/5f6f8fb71dcdf429d8dc4bbf",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"5f6f8fb71dcdf429d8dc4bbf"
 					]
 				}
@@ -1266,12 +1336,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/invite/5f7a82055f4ddb4c40e8d9df",
+					"raw": "{{url}}/event/v1/invite/5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"invite",
 						"5f7a82055f4ddb4c40e8d9df"
 					]
@@ -1304,12 +1375,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/invite_all/5f7a82055f4ddb4c40e8d9df",
+					"raw": "{{url}}/event/v1/invite_all/5f7a82055f4ddb4c40e8d9df",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"invite_all",
 						"5f7a82055f4ddb4c40e8d9df"
 					]
@@ -1342,14 +1414,55 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/event/reminder/5f7033f01dd3a32398c6f692",
+					"raw": "{{url}}/event/v1/reminder/5f7033f01dd3a32398c6f692",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"event",
+						"v1",
 						"reminder",
 						"5f7033f01dd3a32398c6f692"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Poll - Vote",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/poll/v1/5f7a82055f4ddb4c40e8d9df/5f7e21f74994384058e24cfb/5fc6014e0630f54de8c7ded5",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"poll",
+						"v1",
+						"5f7a82055f4ddb4c40e8d9df",
+						"5f7e21f74994384058e24cfb",
+						"5fc6014e0630f54de8c7ded5"
 					]
 				}
 			},

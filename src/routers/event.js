@@ -33,7 +33,7 @@ async function inviteMember(user, event, email) {
     }
 }
 
-router.post('/event/create', [
+router.post('/v1/create', [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
     check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
@@ -58,7 +58,7 @@ router.post('/event/create', [
     }
 })
 
-router.post('/event/invite/:id', auth, async (req, res) => {
+router.post('/v1/invite/:id', auth, async (req, res) => {
     try {
         let user, event;
 
@@ -82,7 +82,7 @@ router.post('/event/invite/:id', auth, async (req, res) => {
     }
 })
 
-router.post('/event/invite_all/:id', auth, async (req, res) => {
+router.post('/v1/invite_all/:id', auth, async (req, res) => {
     try {
         let event = await Event.findById(req.params.id);
 
@@ -93,7 +93,8 @@ router.post('/event/invite_all/:id', auth, async (req, res) => {
         let user;
         for (let i = 0; i < req.body.emails.length; i++) {
             user = await User.findOne({ email: req.body.emails[i] });
-            await inviteMember(user, event, req.body.emails[i]);
+            if (event.members.indexOf(String(user._id)) < 0)
+                inviteMember(user, event, req.body.emails[i]);
         }
         
         res.send({ message: 'Invitation has been sent' });
@@ -102,7 +103,7 @@ router.post('/event/invite_all/:id', auth, async (req, res) => {
     }
 })
 
-router.post('/event/reminder/:id', auth, async (req, res) => {
+router.post('/v1/reminder/:id', auth, async (req, res) => {
     try {
         await checkSendMail('reminder');
         const event = await Event.findById(req.params.id);
@@ -129,7 +130,35 @@ router.post('/event/reminder/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/event/:id', auth, [
+router.patch('/v1/transfer/:id/:organizer', auth, [
+    check('id', 'Invalid Event Id').isMongoId(),
+    check('organizer', 'Invalid Member Id').isMongoId()
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
+        const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
+        if (!event) {
+            throw new NotFoundError('event');
+        }
+
+        const user = await User.findById(req.params.organizer);
+        if (!user) {
+            throw new NotFoundError('user');
+        }
+
+        event.organizer = user._id;
+        await event.save();
+        res.send(event);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.patch('/v1/:id', auth, [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
     check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
@@ -155,7 +184,7 @@ router.patch('/event/:id', auth, [
     }
 })
 
-router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
+router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -188,7 +217,7 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
                 const itemToPick = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToPick.length) {
                     if (!itemToPick[0].assigned_to)
-                    itemToPick[0].assigned_to = req.user._id;
+                        itemToPick[0].assigned_to = req.user._id;
                     else
                         throw new BadRequest('Item already picked. Refresh your Event.');
                 } else {
@@ -207,11 +236,9 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
             case 'delete':
                 const itemToDelete = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToDelete.length) {
-                    if (String(itemToDelete[0].created_by) === String(req.user._id)) {
-                        const elementPos = event.items.indexOf(itemToDelete[0]);
-                        if (elementPos >= 0)
-                            event.items.splice(elementPos, 1);
-                    }
+                    const elementPos = event.items.indexOf(itemToDelete[0]);
+                    if (elementPos >= 0)
+                        event.items.splice(elementPos, 1);
                 } else {
                     throw new NotFoundError('item');
                 }
@@ -229,7 +256,7 @@ router.patch('/event/:id/:action/item', [check('id', 'Invalid Event Id').isMongo
     }
 })
 
-router.delete('/event/:id', [check('id', 'Invalid Event Id').isMongoId()], 
+router.delete('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -250,7 +277,7 @@ router.delete('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
     }
 })
 
-router.get('/my_events/:category', auth, async (req, res) => {
+router.get('/v1/my_events/:category', auth, async (req, res) => {
     try {
         let events;
 
@@ -289,7 +316,7 @@ router.get('/my_events/:category', auth, async (req, res) => {
     }
 })
 
-router.get('/event/:id', [check('id', 'Invalid Event Id').isMongoId()], 
+router.get('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -321,7 +348,7 @@ router.get('/event/:id', [check('id', 'Invalid Event Id').isMongoId()],
     }
 })
 
-router.get('/event/:eventid/item/:id', [
+router.get('/v1/:eventid/item/:id', [
     check('eventid', 'Invalid Event Id').isMongoId(),
     check('id', 'Invalid Item Id').isMongoId()], 
     auth, async (req, res) => {
