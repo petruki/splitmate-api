@@ -4,7 +4,7 @@ const apiKey = process.env.SWITCHER_API_KEY;
 const url = process.env.SWITCHER_API_URL;
 const offline = process.env.SWITCHER_API_OFFLINE === 'true';
 const environment = 'default';
-const domainName = 'Rice and Beans';
+const domainName = 'SpliteMATE';
 const component = 'splitmate-api';
 let switcher;
 
