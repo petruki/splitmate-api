@@ -14,22 +14,25 @@ const router = new express.Router();
 async function inviteMember(user, event, email) {
     // User not registered to the API
     if (!user) { 
+        // Verifies whether the feature is available or not
         await checkSendMail('invite');
-        sendInvite(email, event.name);
-        const userInvite = new UserInvite({ email: email, eventid: event._id });
-        await userInvite.save();
+        
+        let userInvite = await UserInvite.findOne({ email: email, eventid: event._id });
+        if (!userInvite) {
+            userInvite = new UserInvite({ email: email, eventid: event._id });
+            await userInvite.save();
+            sendInvite(email, event.name);
+        }
     } else {
-        // User already joined
+        // User not a member yet
         if (!event.members.includes(user._id)) {
-            // User is pending to awnser
-            if (user.events_pending.length && 
-                user.events_pending.includes(event._id)) {
-                throw new BadRequest('User already invited');
+            // User has no pending requests
+            if (!user.events_pending.length ||
+                !user.events_pending.includes(event._id)) {
+                user.events_pending.push(event._id);
+                await user.save();
             }
         }
-
-        user.events_pending.push(event._id);
-        await user.save();
     }
 }
 
@@ -93,8 +96,13 @@ router.post('/v1/invite_all/:id', auth, async (req, res) => {
         let user;
         for (let i = 0; i < req.body.emails.length; i++) {
             user = await User.findOne({ email: req.body.emails[i] });
-            if (event.members.indexOf(String(user._id)) < 0)
+
+            try {
                 inviteMember(user, event, req.body.emails[i]);
+            } catch (e) {
+                // Email already sent or SENDMAIL feature is disabled
+                continue;
+            }
         }
         
         res.send({ message: 'Invitation has been sent' });
