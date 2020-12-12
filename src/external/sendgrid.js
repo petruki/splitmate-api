@@ -35,4 +35,4 @@ function sendMail(email, eventName, items, template_id) {
 module.exports = {
     sendInvite,
     sendReminder
-}
+};

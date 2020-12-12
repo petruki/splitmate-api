@@ -67,7 +67,7 @@ userSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (!ret._id)
             delete ret.id;
             
@@ -75,7 +75,7 @@ userSchema.options.toJSON = {
         delete ret.token;
         return ret;
     }
-}
+};
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
@@ -86,7 +86,7 @@ userSchema.methods.generateAuthToken = async function () {
     return {
         token: user.token
     };
-}
+};
 
 userSchema.statics.findByCredentials = async (username, password) => {
     const user = await User.findOne({ username });
@@ -102,7 +102,7 @@ userSchema.statics.findByCredentials = async (username, password) => {
     }
 
     return user;
-}
+};
 
 userSchema.pre('save', async function (next) {
     const user = this;
@@ -112,7 +112,7 @@ userSchema.pre('save', async function (next) {
     }
     
     next();
-})
+});
 
 userSchema.post('save', function(error, doc, next) {
     if (error.name === 'MongoError' && error.code === 11000) {
@@ -146,7 +146,7 @@ userSchema.pre('remove', async function (next) {
     }
 
     next();
-})
+});
 
 const User = mongoose.model('User', userSchema);
 

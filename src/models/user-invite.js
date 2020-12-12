@@ -14,14 +14,14 @@ const userInviteSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 userInviteSchema.virtual('v_event', {
     ref: 'Event',
     localField: 'eventid',
     foreignField: '_id',
     justOne : true
-})
+});
 
 const UserInvite = mongoose.model('UserInvite', userInviteSchema);
 

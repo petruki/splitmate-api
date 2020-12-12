@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const Switcher = require('switcher-client');
 
 const apiKey = process.env.SWITCHER_API_KEY;
@@ -36,11 +37,11 @@ async function checkSendMail(action) {
 
     if (!await switcher.isItOn('SENDMAIL', [
         Switcher.StrategiesType.VALUE, action])) {
-        throw new Error(`Send email is not available`);  
+        throw new Error('Send email is not available');  
     }
 }
 
 module.exports = {
     checkSignUp,
     checkSendMail
-}
+};

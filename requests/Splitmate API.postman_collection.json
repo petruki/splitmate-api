@@ -74,7 +74,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Roger\",\r\n    \"username\": \"roger\",\r\n    \"email\": \"mail@mail.com\",\r\n    \"password\": \"123\"\r\n}",
+					"raw": "{\r\n    \"name\": \"Roger123\",\r\n    \"username\": \"roger123\",\r\n    \"email\": \"mail123@mail.com\",\r\n    \"password\": \"123\",\r\n    \"token\": \"123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

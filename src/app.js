@@ -23,15 +23,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 /**
  * API Routers
  */
-app.use("/user", userRouter);
-app.use("/event", eventRouter);
-app.use("/poll", pollRouter);
+app.use('/user', userRouter);
+app.use('/event', eventRouter);
+app.use('/poll', pollRouter);
 app.get('/check', (req, res) => {
-    res.status(200).send({ message: 'All good', code: 200 })
+    res.status(200).send({ message: 'All good', code: 200 });
 });
 
 app.get('*', (req, res) => {
-    res.status(404).send({ error: 'Operation not found' })
+    res.status(404).send({ error: 'Operation not found' });
 });
 
 module.exports = {
