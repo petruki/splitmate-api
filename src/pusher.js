@@ -1,8 +1,6 @@
 const socketio = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { User } = require('./models/user');
-const { compareSync } = require('bcrypt');
-const item = require('./models/item');
 
 class Pusher {
     constructor(server) {
@@ -27,7 +25,7 @@ class Pusher {
                 throw new Error();
             }
             
-            socket.join(socket.handshake.query.channel)
+            socket.join(socket.handshake.query.channel);
             next();
         } catch (e) {
             next(new Error('Not authorized'));

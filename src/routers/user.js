@@ -6,6 +6,7 @@ const { Event } = require('../models/event');
 const { UserInvite } = require('../models/user-invite');
 const { checkSignUp } = require('../external/switcher-api-facade');
 const { responseException, BadRequest, NotFoundError } = require('./common/index');
+const { validate_token } = require('../external/google-recaptcha');
 
 const router = new express.Router();
 
@@ -49,6 +50,7 @@ router.post('/v1/signup', [
     }
 
     try {
+        await validate_token(req);
         await checkSignUp(req.body.email);
         const user = new User(req.body);
         const jwt = await user.generateAuthToken();
@@ -57,7 +59,7 @@ router.post('/v1/signup', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/login', [
     check('username').isLength({ min: 3 }),
@@ -77,7 +79,7 @@ router.post('/v1/login', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
     auth, async (req, res) => {
@@ -111,7 +113,7 @@ router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()]
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -131,7 +133,7 @@ router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -153,7 +155,7 @@ router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/event/:user/remove', [
     check('eventid', 'Invalid Event Id').isMongoId(),
@@ -183,7 +185,7 @@ router.post('/v1/event/:user/remove', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -213,7 +215,7 @@ router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').i
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/logout', auth, async (req, res) => {
     try {
@@ -223,7 +225,7 @@ router.post('/v1/logout', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/v1/me', auth, async (req, res) => {
     try {
@@ -232,7 +234,7 @@ router.get('/v1/me', auth, async (req, res) => {
         responseException(res, e, 500);
     }
 
-})
+});
 
 router.get('/v1/find', [check('username').isLength({ min: 2 })], 
     auth, async (req, res) => {
@@ -247,7 +249,7 @@ router.get('/v1/find', [check('username').isLength({ min: 2 })],
         .lean();
 
     res.send(user);
-})
+});
 
 router.delete('/v1/me', auth, async (req, res) => {
     try {
@@ -256,6 +258,6 @@ router.delete('/v1/me', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 module.exports = router;

@@ -1,13 +1,13 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const { auth, verifyInputUpdateParameters } = require('../middleware/index');
-const { checkSignUp, checkSendMail } = require('../external/switcher-api-facade');
+const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
 const { Event } = require('../models/event');
 const { User } = require('../models/user');
 const { UserInvite } = require('../models/user-invite');
 const { Item } = require('../models/item'); 
-const { responseException, BadRequest, NotFoundError, PermissionError } = require('./common/index');
+const { responseException, BadRequest, NotFoundError } = require('./common/index');
 
 const router = new express.Router();
 
@@ -59,7 +59,7 @@ router.post('/v1/create', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/invite/:id', auth, async (req, res) => {
     try {
@@ -83,7 +83,7 @@ router.post('/v1/invite/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/invite_all/:id', auth, async (req, res) => {
     try {
@@ -109,7 +109,7 @@ router.post('/v1/invite_all/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.post('/v1/reminder/:id', auth, async (req, res) => {
     try {
@@ -136,7 +136,7 @@ router.post('/v1/reminder/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/v1/transfer/:id/:organizer', auth, [
     check('id', 'Invalid Event Id').isMongoId(),
@@ -164,7 +164,7 @@ router.patch('/v1/transfer/:id/:organizer', auth, [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/v1/:id', auth, [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
@@ -190,7 +190,7 @@ router.patch('/v1/:id', auth, [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -207,12 +207,13 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
         }
 
         switch (req.params.action) {
-            case 'add':
+            case 'add': {
                 const item = new Item(req.body);
                 item.created_by = req.user._id;
                 event.items.push(item);
                 break;
-            case 'edit':
+            }
+            case 'edit': {
                 const itemToEdit = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToEdit.length) {
                     const updates = Object.keys(req.body);
@@ -221,7 +222,8 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
                     throw new NotFoundError('item');
                 }
                 break;
-            case 'pick':
+            }
+            case 'pick': {
                 const itemToPick = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToPick.length) {
                     if (!itemToPick[0].assigned_to)
@@ -232,7 +234,8 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
                     throw new NotFoundError('item');
                 }
                 break;
-            case 'unpick':
+            }
+            case 'unpick': {
                 const itemToUnPick = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToUnPick.length) {
                     itemToUnPick[0].assigned_to = undefined;
@@ -240,8 +243,8 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
                     throw new NotFoundError('item');
                 }
                 break;
-            break;
-            case 'delete':
+            }
+            case 'delete': {
                 const itemToDelete = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToDelete.length) {
                     const elementPos = event.items.indexOf(itemToDelete[0]);
@@ -251,7 +254,7 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
                     throw new NotFoundError('item');
                 }
                 break;
-            break;
+            }
             default:
                 throw new BadRequest(
                     `Invalid operation '${req.params.action}' - try [add, edit, pick, unpick, delete]`);
@@ -262,7 +265,7 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -283,7 +286,7 @@ router.delete('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()],
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/v1/my_events/:category', auth, async (req, res) => {
     try {
@@ -300,7 +303,7 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
                     .find({ _id: req.user.events_archived })
                     .select('-items -members');
                 break;
-            case 'invited':
+            case 'invited': {
                 events = await Event
                     .find({ _id: req.user.events_pending })
                     .select('-items -members');
@@ -314,6 +317,7 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
                     events.push(fromEmailInvitation[i].v_event);
                 }
                 break;
+            }
             default:
                 throw new BadRequest('Event category not valid');
         }
@@ -322,7 +326,7 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
@@ -354,7 +358,7 @@ router.get('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()],
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/v1/:eventid/item/:id', [
     check('eventid', 'Invalid Event Id').isMongoId(),
@@ -399,6 +403,6 @@ router.get('/v1/:eventid/item/:id', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 module.exports = router;

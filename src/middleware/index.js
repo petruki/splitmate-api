@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { User } = require('../models/user');
 
-const digestedServerApiKey = crypto.createHash('md5').update(process.env.API_SECRET).digest("hex").toUpperCase();
+const digestedServerApiKey = crypto.createHash('md5').update(process.env.API_SECRET).digest('hex').toUpperCase();
 
 function validateApiKey(req) {
     if (process.env.ENV === 'prod') {
@@ -40,16 +40,16 @@ function verifyInputUpdateParameters(allowedUpdates) {
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
         if (!isValidOperation) {
-            return res.status(400).send({ error: `Invalid update parameters` });
+            return res.status(400).send({ error: 'Invalid update parameters' });
         }
 
         req.updates = updates;
         next();
-    }
+    };
 }
 
 module.exports = {
     auth,
     verifyInputUpdateParameters,
     validateApiKey
-}
+};
