@@ -8,14 +8,19 @@ const { User } = require('../models/user');
 const { UserInvite } = require('../models/user-invite');
 const { Item } = require('../models/item'); 
 const { responseException, BadRequest, NotFoundError } = require('./common/index');
+const { Plan } = require('../models/plan');
 
 const router = new express.Router();
 
-async function inviteMember(user, event, email) {
+async function inviteMember(user, member, event, email) {
     // User not registered to the API
-    if (!user) { 
+    if (!member && user.v_plan.enable_invite_email) { 
         // Verifies whether the feature is available or not
         await checkSendMail('invite');
+        const maxEvents = await Plan.checkMaxEvents(member);
+        if (maxEvents) {
+            throw new BadRequest(maxEvents);
+        }
         
         let userInvite = await UserInvite.findOne({ email: email, eventid: event._id });
         if (!userInvite) {
@@ -25,12 +30,12 @@ async function inviteMember(user, event, email) {
         }
     } else {
         // User not a member yet
-        if (!event.members.includes(user._id)) {
+        if (!event.members.includes(member._id)) {
             // User has no pending requests
-            if (!user.events_pending.length ||
-                !user.events_pending.includes(event._id)) {
-                user.events_pending.push(event._id);
-                await user.save();
+            if (!member.events_pending.length ||
+                !member.events_pending.includes(event._id)) {
+                member.events_pending.push(event._id);
+                await member.save();
             }
         }
     }
@@ -47,6 +52,11 @@ router.post('/v1/create', [
     }
 
     try {
+        const maxEvents = await Plan.checkMaxEvents(req.user);
+        if (maxEvents) {
+            throw new BadRequest(maxEvents);
+        }
+
         const event = new Event(req.body);
         event.organizer = req.user._id;
         event.members.push(req.user._id);
@@ -61,44 +71,23 @@ router.post('/v1/create', [
     }
 });
 
-router.post('/v1/invite/:id', auth, async (req, res) => {
-    try {
-        let user, event;
-
-        await Promise.all([
-            User.findOne({ $or: [{ email: req.body.email }, { username: req.body.username }] }),
-            Event.findById(req.params.id)
-        ]).then(result => {
-            user = result[0];
-            event = result[1];
-        });
-
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-
-        await inviteMember(user, event, req.body.email);
-
-        res.send({ message: 'Invitation has been sent' });
-    } catch (e) {
-        responseException(res, e, 500);
-    }
-});
-
 router.post('/v1/invite_all/:id', auth, async (req, res) => {
     try {
         let event = await Event.findById(req.params.id);
-
         if (!event) {
             throw new NotFoundError('event');
         }
 
-        let user;
-        for (let i = 0; i < req.body.emails.length; i++) {
-            user = await User.findOne({ email: req.body.emails[i] });
+        const maxMembers = await Plan.checkMaxMembers(req.user, event, req.body.emails.length);
+        if (maxMembers) {
+            throw new BadRequest(maxMembers);
+        }
 
+        let member;
+        for (let i = 0; i < req.body.emails.length; i++) {
             try {
-                inviteMember(user, event, req.body.emails[i]);
+                member = await User.findOne({ email: req.body.emails[i] });
+                inviteMember(req.user, member, event, req.body.emails[i]);
             } catch (e) {
                 // Email already sent or SENDMAIL feature is disabled
                 continue;
@@ -158,6 +147,11 @@ router.patch('/v1/transfer/:id/:organizer', auth, [
             throw new NotFoundError('user');
         }
 
+        const maxEvents = await Plan.checkMaxEvents(user);
+        if (maxEvents) {
+            throw new BadRequest(maxEvents);
+        }
+
         event.organizer = user._id;
         await event.save();
         res.send(event);
@@ -208,6 +202,11 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
 
         switch (req.params.action) {
             case 'add': {
+                const maxItems = await Plan.checkMaxItems(req.user, event);
+                if (maxItems) {
+                    throw new BadRequest(maxItems);
+                }
+
                 const item = new Item(req.body);
                 item.created_by = req.user._id;
                 event.items.push(item);
@@ -216,6 +215,11 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
             case 'edit': {
                 const itemToEdit = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToEdit.length) {
+                    const maxPollItems = await Plan.checkMaxPollItems(req.user, itemToEdit[0]);
+                    if (maxPollItems) {
+                        throw new BadRequest(maxPollItems);
+                    }
+                    
                     const updates = Object.keys(req.body);
                     updates.forEach((update) => itemToEdit[0][update] = req.body[update]);
                 } else {

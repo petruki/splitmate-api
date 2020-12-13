@@ -4,11 +4,6 @@ const jwt = require('jsonwebtoken');
 const { Event } = require('./event');
 const { PermissionError, BadRequest } = require('../routers/common/index');
 
-const PlanType = Object.freeze({
-    FOUNDER: 'FOUNDER',
-    MEMBER: 'MEMBER'
-});
-
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -33,10 +28,8 @@ const userSchema = new mongoose.Schema({
         trim: true
     },
     plan: {
-        type: String,
-        enum: Object.values(PlanType),
-        required: true,
-        default: PlanType.MEMBER
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Plan'
     },
     token: {
         type: String
@@ -61,6 +54,13 @@ userSchema.virtual('v_events_archived', {
     ref: 'Event',
     localField: 'events_archived',
     foreignField: '_id'
+});
+
+userSchema.virtual('v_plan', {
+    ref: 'Plan',
+    localField: 'plan',
+    foreignField: '_id',
+    justOne : true
 });
 
 userSchema.options.toJSON = {
@@ -151,6 +151,5 @@ userSchema.pre('remove', async function (next) {
 const User = mongoose.model('User', userSchema);
 
 module.exports = {
-    User,
-    PlanType
+    User
 };

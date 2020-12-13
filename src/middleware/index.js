@@ -26,6 +26,7 @@ async function auth(req, res, next) {
             throw new Error();
         }
 
+        await user.populate({ path: 'v_plan' }).execPopulate();
         req.token = token;
         req.user = user;
         next();

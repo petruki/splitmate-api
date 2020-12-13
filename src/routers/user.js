@@ -7,6 +7,7 @@ const { UserInvite } = require('../models/user-invite');
 const { checkSignUp } = require('../external/switcher-api-facade');
 const { responseException, BadRequest, NotFoundError } = require('./common/index');
 const { validate_token } = require('../external/google-recaptcha');
+const { Plan } = require('../models/plan');
 
 const router = new express.Router();
 
@@ -52,9 +53,12 @@ router.post('/v1/signup', [
     try {
         await validate_token(req);
         await checkSignUp(req.body.email);
+
         const user = new User(req.body);
         const jwt = await user.generateAuthToken();
 
+        await Plan.setDefaultPlan(user);
+        await user.populate({ path: 'v_plan' }).execPopulate();
         res.status(201).send({ user, jwt });
     } catch (e) {
         responseException(res, e, 500);
@@ -75,6 +79,8 @@ router.post('/v1/login', [
         
         const user = await User.findByCredentials(req.body.username, req.body.password);
         const jwt = await user.generateAuthToken();
+        await user.populate({ path: 'v_plan' }).execPopulate();
+
         res.send({ user, jwt });
     } catch (e) {
         responseException(res, e, 500);
@@ -89,8 +95,12 @@ router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()]
             return res.status(422).json({ errors: errors.array() });
         }
 
-        const event = await Event.findOne({ _id: req.query.eventid });
+        const maxEvents = await Plan.checkMaxEvents(req.user);
+        if (maxEvents) {
+            throw new BadRequest(maxEvents);
+        }
 
+        const event = await Event.findOne({ _id: req.query.eventid });
         if (!event) {
             throw new NotFoundError('event');
         }
@@ -124,7 +134,6 @@ router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId
         }
 
         const elementPos = req.user.events_pending.indexOf(req.query.eventid);
-
         if (elementPos >= 0) {
             req.user.events_pending.splice(elementPos, 1);
             await req.user.save();
@@ -144,7 +153,6 @@ router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()
         }
 
         const event = await Event.findOne({ _id: req.query.eventid });
-
         if (!event) {
             throw new NotFoundError('event');
         }
@@ -168,13 +176,11 @@ router.post('/v1/event/:user/remove', [
         }
 
         const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
-
         if (!event) {
             throw new NotFoundError('event');
         }
 
         const user = await User.findById(req.params.user);
-
         if (!user) {
             throw new NotFoundError('user');
         }
@@ -196,7 +202,6 @@ router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').i
         }
 
         const elementPos = req.user.events_archived.indexOf(req.query.eventid);
-
         if (req.params.action === 'add') {
             if (elementPos < 0) {
                 req.user.events_archived.push(req.query.eventid);
@@ -233,7 +238,6 @@ router.get('/v1/me', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-
 });
 
 router.get('/v1/find', [check('username').isLength({ min: 2 })], 
