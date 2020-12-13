@@ -4,11 +4,14 @@ const cors = require('cors');
 const userRouter = require('./routers/user');
 const eventRouter = require('./routers/event');
 const pollRouter = require('./routers/poll');
+const { Plan } = require('./models/plan');
 
 /**
  * Initialize MongoDB
  */
 require('./db/mongoose');
+if (process.env.ENV != 'test')
+    Plan.startDefaultPlans();
 
 const app = express();
 
