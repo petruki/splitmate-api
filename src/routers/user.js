@@ -51,14 +51,20 @@ router.post('/v1/signup', [
     }
 
     try {
+        //validate google captcha
         await validate_token(req);
+        //validate switcher signup
         await checkSignUp(req.body.email);
 
+        //create user
         const user = new User(req.body);
-        const jwt = await user.generateAuthToken();
-
+        //set plan
         await Plan.setDefaultPlan(user);
+        //save and generate auth tken
+        const jwt = await user.generateAuthToken();
+        //return plan attributes
         await user.populate({ path: 'v_plan' }).execPopulate();
+
         res.status(201).send({ user, jwt });
     } catch (e) {
         responseException(res, e, 500);
