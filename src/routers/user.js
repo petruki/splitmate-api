@@ -1,13 +1,10 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const { auth, validateApiKey } = require('../middleware/index');
-const { User } = require('../models/user');
-const { Event } = require('../models/event');
-const { UserInvite } = require('../models/user-invite');
+const { auth, validateApiKey } = require('../middleware');
+const { Event, User, UserInvite, Plan } = require('../models');
 const { checkSignUp } = require('../external/switcher-api-facade');
-const { responseException, BadRequest, NotFoundError } = require('./common/index');
+const { responseException, BadRequest, NotFoundError } = require('./common');
 const { validate_token } = require('../external/google-recaptcha');
-const { Plan } = require('../models/plan');
 
 const router = new express.Router();
 
@@ -173,8 +170,7 @@ router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()
 
 router.post('/v1/event/:user/remove', [
     check('eventid', 'Invalid Event Id').isMongoId(),
-    check('user', 'Invalid User Id').isMongoId()], 
-    auth, async (req, res) => {
+    check('user', 'Invalid User Id').isMongoId()], auth, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -246,19 +242,22 @@ router.get('/v1/me', auth, async (req, res) => {
     }
 });
 
-router.get('/v1/find', [check('username').isLength({ min: 2 })], 
-    auth, async (req, res) => {
+router.get('/v1/find', [check('username').isLength({ min: 2 })], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
 
-    let user = await User
-        .findOne({ username: req.query.username })
-        .select('_id username name email')
-        .lean();
+    try {
+        let user = await User
+            .findOne({ username: req.query.username })
+            .select('_id username name email')
+            .lean();
 
-    res.send(user);
+        res.send(user);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
 });
 
 router.delete('/v1/me', auth, async (req, res) => {
