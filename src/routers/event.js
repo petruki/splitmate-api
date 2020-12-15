@@ -1,27 +1,18 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const { auth, verifyInputUpdateParameters } = require('../middleware/index');
+const { auth, verifyInputUpdateParameters } = require('../middleware');
 const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
-const { Event } = require('../models/event');
-const { User } = require('../models/user');
-const { UserInvite } = require('../models/user-invite');
-const { Item } = require('../models/item'); 
-const { responseException, BadRequest, NotFoundError } = require('./common/index');
-const { Plan } = require('../models/plan');
+const { Event, User, UserInvite, Item, Plan } = require('../models');
+const { responseException, BadRequest, NotFoundError } = require('./common');
 
 const router = new express.Router();
 
 async function inviteMember(user, member, event, email) {
-    // User not registered to the API
+    // User does not exist
     if (!member && user.v_plan.enable_invite_email) { 
         // Verifies whether the feature is available or not
         await checkSendMail('invite');
-        const maxEvents = await Plan.checkMaxEvents(member);
-        if (maxEvents) {
-            throw new BadRequest(maxEvents);
-        }
-        
         let userInvite = await UserInvite.findOne({ email: email, eventid: event._id });
         if (!userInvite) {
             userInvite = new UserInvite({ email: email, eventid: event._id });
@@ -85,13 +76,8 @@ router.post('/v1/invite_all/:id', auth, async (req, res) => {
 
         let member;
         for (let i = 0; i < req.body.emails.length; i++) {
-            try {
-                member = await User.findOne({ email: req.body.emails[i] });
-                inviteMember(req.user, member, event, req.body.emails[i]);
-            } catch (e) {
-                // Email already sent or SENDMAIL feature is disabled
-                continue;
-            }
+            member = await User.findOne({ email: req.body.emails[i] });
+            inviteMember(req.user, member, event, req.body.emails[i]);
         }
         
         res.send({ message: 'Invitation has been sent' });
