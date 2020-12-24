@@ -48,6 +48,8 @@ router.post('/v1/signup', [
     }
 
     try {
+        validateApiKey(req);
+        
         //validate google captcha
         await validate_token(req);
         //validate switcher signup
@@ -92,12 +94,13 @@ router.post('/v1/login', [
 
 router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
     auth, async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
         const maxEvents = await Plan.checkMaxEvents(req.user);
         if (maxEvents) {
             throw new BadRequest(maxEvents);
@@ -130,12 +133,13 @@ router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()]
 
 router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
         const elementPos = req.user.events_pending.indexOf(req.query.eventid);
         if (elementPos >= 0) {
             req.user.events_pending.splice(elementPos, 1);
@@ -149,19 +153,19 @@ router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId
 
 router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
         const event = await Event.findOne({ _id: req.query.eventid });
         if (!event) {
             throw new NotFoundError('event');
         }
 
         await removeUser(event, req.user);
-        
         res.send(req.user);
     } catch (e) {
         responseException(res, e, 500);
@@ -171,12 +175,13 @@ router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()
 router.post('/v1/event/:user/remove', [
     check('eventid', 'Invalid Event Id').isMongoId(),
     check('user', 'Invalid User Id').isMongoId()], auth, async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
         const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
         if (!event) {
             throw new NotFoundError('event');
@@ -188,7 +193,6 @@ router.post('/v1/event/:user/remove', [
         }
 
         await removeUser(event, user);
-
         res.send(event);
     } catch (e) {
         responseException(res, e, 500);
@@ -197,25 +201,35 @@ router.post('/v1/event/:user/remove', [
 
 router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
     auth, async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
+        const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
+        if (!event) {
+            throw new NotFoundError('event');
         }
 
-        const elementPos = req.user.events_archived.indexOf(req.query.eventid);
-        if (req.params.action === 'add') {
-            if (elementPos < 0) {
-                req.user.events_archived.push(req.query.eventid);
-                await req.user.save();
-            }
-        } else if (req.params.action === 'remove') {
-            if (elementPos >= 0) {
-                req.user.events_archived.splice(elementPos, 1);
-                await req.user.save();
-            }
-        } else {
-            throw new BadRequest(`Command '${req.params.action}' does not exist - try [add, remove]`);
+        const elementPos = req.user.events_archived.indexOf(event._id);
+        switch(req.params.action) {
+            case 'add':
+                if (elementPos < 0) {
+                    req.user.events_archived.push(event._id);
+                    await req.user.save();
+                }
+                break;
+            case 'remove':
+                if (elementPos >= 0) {
+                    req.user.events_archived.splice(elementPos, 1);
+                    await req.user.save();
+                }
+                break;
+            default:
+                throw new BadRequest(
+                    `Command '${req.params.action}' does not exist - try [add, remove]`);
         }
         
         res.send(req.user);
