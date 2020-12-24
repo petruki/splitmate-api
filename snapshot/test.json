@@ -1,0 +1,53 @@
+{
+    "data": {
+        "domain": {
+            "name": "SplitMATE",
+            "version": 1600981231266,
+            "activated": true,
+            "group": [
+                {
+                    "name": "Release 1",
+                    "activated": true,
+                    "config": [
+                        {
+                            "key": "SIGNUP",
+                            "activated": true,
+                            "strategies": [
+                                {
+                                    "strategy": "VALUE_VALIDATION",
+                                    "activated": true,
+                                    "operation": "EXIST",
+                                    "values": [
+                                        "test@mail.com"
+                                    ]
+                                }
+                            ],
+                            "components": [
+                                "splitmate-api",
+                                "splitmate-app"
+                            ]
+                        },
+                        {
+                            "key": "SENDMAIL",
+                            "activated": false,
+                            "strategies": [
+                              {
+                                "strategy": "VALUE_VALIDATION",
+                                "activated": true,
+                                "operation": "EXIST",
+                                "values": [
+                                  "invite",
+                                  "reminder"
+                                ]
+                              }
+                            ],
+                            "components": [
+                              "splitmate-api"
+                            ]
+                          }
+                    ]
+                }
+            ]
+        }
+    }
+}
