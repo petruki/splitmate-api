@@ -5,12 +5,14 @@ const request = require('supertest');
 const sinon = require('sinon');
 const axios = require('axios');
 
+const restoreDb = require('./fixtures/restore-db');
 const planFixture = require('./fixtures/plan.fixture');
 const userFixture = require('./fixtures/user.fixture');
 
 beforeAll(() => Switcher.setTestEnabled());
 
 afterAll(async () => {
+  await restoreDb();
   await new Promise(resolve => setTimeout(resolve, 1000));
   await mongoose.disconnect();
 });

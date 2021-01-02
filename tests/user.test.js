@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Switcher = require('switcher-client');
 const request = require('supertest');
 
+const restoreDb = require('./fixtures/restore-db');
 const planFixture = require('./fixtures/plan.fixture');
 const userFixture = require('./fixtures/user.fixture');
 const { setupEventCollection, event1 } = require('./fixtures/event.fixture');
@@ -11,6 +12,7 @@ const { User } = require('../src/models');
 beforeAll(() => Switcher.setTestEnabled());
 
 afterAll(async () => {
+  await restoreDb();
   await new Promise(resolve => setTimeout(resolve, 1000));
   await mongoose.disconnect();
 });
