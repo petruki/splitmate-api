@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { BadRequest } = require('../routers/common');
 const { Event } = require('./event');
 
 const PlanType = Object.freeze({
@@ -50,26 +51,26 @@ planSchema.statics.setDefaultPlan = async function (user) {
 
 planSchema.statics.checkMaxEvents = async function(user) {
     const numEvents = await Event.find({ members: user._id }).countDocuments();
-    return numEvents >= user.v_plan.max_events && user.v_plan.max_events != -1 ? 
-        'Max number of Events has been reached' : undefined;
+    if (numEvents >= user.v_plan.max_events && user.v_plan.max_events != -1)
+        throw new BadRequest('Max number of Events has been reached');
 };
 
 planSchema.statics.checkMaxItems = async function(user, event) {
     const numItems = event.items.length;
-    return numItems >= user.v_plan.max_items && user.v_plan.max_items != -1 ?
-        'Max number of Items has been reached' : undefined;
+    if (numItems >= user.v_plan.max_items && user.v_plan.max_items != -1)
+        throw new BadRequest('Max number of Items has been reached');
 };
 
 planSchema.statics.checkMaxPollItems = async function(user, item) {
     const numPollItems = item.poll.length;
-    return numPollItems >= user.v_plan.max_poll_items && user.v_plan.max_poll_items != -1 ?
-        'Max number of Poll Items has been reached' : undefined;
+    if (numPollItems >= user.v_plan.max_poll_items && user.v_plan.max_poll_items != -1)
+        throw new BadRequest('Max number of Poll Items has been reached');
 };
 
 planSchema.statics.checkMaxMembers = async function(user, event, adding) {
     const numEventMembers = event.members.length + adding;
-    return numEventMembers >= user.v_plan.max_members && user.v_plan.max_members != -1 ?
-        'Max number of members has been reached' : undefined;
+    if (numEventMembers >= user.v_plan.max_members && user.v_plan.max_members != -1)
+        throw new BadRequest('Max number of members has been reached');
 };
 
 planSchema.statics.startDefaultPlans = function () {

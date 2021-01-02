@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { User } = require('../models/user');
@@ -49,8 +50,18 @@ function verifyInputUpdateParameters(allowedUpdates) {
     };
 }
 
+function validate(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    next();
+}
+
 module.exports = {
     auth,
     verifyInputUpdateParameters,
-    validateApiKey
+    validateApiKey,
+    validate
 };

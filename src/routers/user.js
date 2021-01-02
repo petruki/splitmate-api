@@ -1,6 +1,6 @@
 const express = require('express');
-const { check, validationResult } = require('express-validator');
-const { auth, validateApiKey } = require('../middleware');
+const { check } = require('express-validator');
+const { auth, validateApiKey, validate } = require('../middleware');
 const { Event, User, UserInvite, Plan } = require('../models');
 const { checkSignUp } = require('../external/switcher-api-facade');
 const { responseException, BadRequest, NotFoundError } = require('./common');
@@ -41,12 +41,7 @@ router.post('/v1/signup', [
     check('email').isEmail(),
     check('password').isLength({ min: 3 }),
     check('plan').isEmpty()
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
+], validate, async (req, res) => {
     try {
         validateApiKey(req);
         
@@ -73,12 +68,7 @@ router.post('/v1/signup', [
 router.post('/v1/login', [
     check('username').isLength({ min: 3 }),
     check('password').isLength({ min: 3 })
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
+], validate, async (req, res) => {
     try {
         validateApiKey(req);
         
@@ -93,18 +83,10 @@ router.post('/v1/login', [
 });
 
 router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()],
-    auth, async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    validate, auth, async (req, res) => {
 
     try {
-        const maxEvents = await Plan.checkMaxEvents(req.user);
-        if (maxEvents) {
-            throw new BadRequest(maxEvents);
-        }
+        await Plan.checkMaxEvents(req.user);
 
         const event = await Event.findOne({ _id: req.query.eventid });
         if (!event) {
@@ -132,12 +114,7 @@ router.post('/v1/event/join', [check('eventid', 'Invalid Event Id').isMongoId()]
 });
 
 router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    validate, auth, async (req, res) => {
 
     try {
         const elementPos = req.user.events_pending.indexOf(req.query.eventid);
@@ -152,12 +129,7 @@ router.post('/v1/event/dismiss', [check('eventid', 'Invalid Event Id').isMongoId
 });
 
 router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    validate, auth, async (req, res) => {
 
     try {
         const event = await Event.findOne({ _id: req.query.eventid });
@@ -174,12 +146,8 @@ router.post('/v1/event/leave', [check('eventid', 'Invalid Event Id').isMongoId()
 
 router.post('/v1/event/:user/remove', [
     check('eventid', 'Invalid Event Id').isMongoId(),
-    check('user', 'Invalid User Id').isMongoId()], auth, async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    check('user', 'Invalid User Id').isMongoId()], 
+    validate, auth, async (req, res) => {
 
     try {
         const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
@@ -200,12 +168,7 @@ router.post('/v1/event/:user/remove', [
 });
 
 router.post('/v1/event/:action/archive', [check('eventid', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    validate, auth, async (req, res) => {
 
     try {
         const event = await Event.findOne({ _id: req.query.eventid, organizer: req.user._id });
@@ -256,11 +219,8 @@ router.get('/v1/me', auth, async (req, res) => {
     }
 });
 
-router.get('/v1/find', [check('username').isLength({ min: 2 })], auth, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+router.get('/v1/find', [check('username').isLength({ min: 2 })], 
+    validate, auth, async (req, res) => {
 
     try {
         let user = await User

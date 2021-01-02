@@ -1,6 +1,6 @@
 const express = require('express');
-const { check, validationResult } = require('express-validator');
-const { auth, verifyInputUpdateParameters } = require('../middleware');
+const { check } = require('express-validator');
+const { auth, verifyInputUpdateParameters, validate } = require('../middleware');
 const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
 const { Event, User, UserInvite, Item, Plan } = require('../models');
@@ -36,17 +36,9 @@ router.post('/v1/create', [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
     check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
-], auth, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
+], validate, auth, async (req, res) => {
     try {
-        const maxEvents = await Plan.checkMaxEvents(req.user);
-        if (maxEvents) {
-            throw new BadRequest(maxEvents);
-        }
+        await Plan.checkMaxEvents(req.user);
 
         const event = new Event(req.body);
         event.organizer = req.user._id;
@@ -62,17 +54,16 @@ router.post('/v1/create', [
     }
 });
 
-router.post('/v1/invite_all/:id', auth, async (req, res) => {
+router.post('/v1/invite_all/:id', [
+    check('id', 'Invalid Event Id').isMongoId()
+], validate, auth, async (req, res) => {
     try {
         let event = await Event.findById(req.params.id);
         if (!event) {
             throw new NotFoundError('event');
         }
 
-        const maxMembers = await Plan.checkMaxMembers(req.user, event, req.body.emails.length);
-        if (maxMembers) {
-            throw new BadRequest(maxMembers);
-        }
+        await Plan.checkMaxMembers(req.user, event, req.body.emails.length);
 
         let member;
         for (let i = 0; i < req.body.emails.length; i++) {
@@ -86,7 +77,9 @@ router.post('/v1/invite_all/:id', auth, async (req, res) => {
     }
 });
 
-router.post('/v1/reminder/:id', auth, async (req, res) => {
+router.post('/v1/reminder/:id', [
+    check('id', 'Invalid Event Id').isMongoId()
+], validate, auth, async (req, res) => {
     try {
         await checkSendMail('reminder');
         const event = await Event.findById(req.params.id);
@@ -113,16 +106,11 @@ router.post('/v1/reminder/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/v1/transfer/:id/:organizer', auth, [
+router.patch('/v1/transfer/:id/:organizer', [
     check('id', 'Invalid Event Id').isMongoId(),
     check('organizer', 'Invalid Member Id').isMongoId()
-], async (req, res) => {
+], validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
         if (!event) {
             throw new NotFoundError('event');
@@ -133,11 +121,7 @@ router.patch('/v1/transfer/:id/:organizer', auth, [
             throw new NotFoundError('user');
         }
 
-        const maxEvents = await Plan.checkMaxEvents(user);
-        if (maxEvents) {
-            throw new BadRequest(maxEvents);
-        }
-
+        await Plan.checkMaxEvents(user);
         event.organizer = user._id;
         await event.save();
         res.send(event);
@@ -146,18 +130,13 @@ router.patch('/v1/transfer/:id/:organizer', auth, [
     }
 });
 
-router.patch('/v1/:id', auth, [
+router.patch('/v1/:id', [
     check('name', 'Name must have minimum of 2 and maximum of 100 characters').isLength({ min: 2, max: 100 }),
     check('description', 'Description must have maximum of 5000 characters').isLength({ max: 5000 }),
     check('location', 'Location must have maximum of 500 characters').isLength({ max: 500 })
 ], verifyInputUpdateParameters(['name', 'description', 'date', 'location']
-), async (req, res) => {
+), validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
 
         if (!event) {
@@ -173,13 +152,8 @@ router.patch('/v1/:id', auth, [
 });
 
 router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
+    validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
 
         if (!event) {
@@ -188,10 +162,7 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
 
         switch (req.params.action) {
             case 'add': {
-                const maxItems = await Plan.checkMaxItems(req.user, event);
-                if (maxItems) {
-                    throw new BadRequest(maxItems);
-                }
+                await Plan.checkMaxItems(req.user, event);
 
                 const item = new Item(req.body);
                 item.created_by = req.user._id;
@@ -201,10 +172,7 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
             case 'edit': {
                 const itemToEdit = event.items.filter(item => String(item._id) === String(req.body._id));
                 if (itemToEdit.length) {
-                    const maxPollItems = await Plan.checkMaxPollItems(req.user, itemToEdit[0]);
-                    if (maxPollItems) {
-                        throw new BadRequest(maxPollItems);
-                    }
+                    await Plan.checkMaxPollItems(req.user, itemToEdit[0]);
                     
                     const updates = Object.keys(req.body);
                     updates.forEach((update) => itemToEdit[0][update] = req.body[update]);
@@ -258,13 +226,8 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
 });
 
 router.delete('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
+    validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
 
         if (!event) {
@@ -319,13 +282,8 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
 });
 
 router.get('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
-    auth, async (req, res) => {
+    validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        
         const event = 
             await Event
                 .findById(req.params.id)
@@ -353,13 +311,9 @@ router.get('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()],
 router.get('/v1/:eventid/item/:id', [
     check('eventid', 'Invalid Event Id').isMongoId(),
     check('id', 'Invalid Item Id').isMongoId()], 
-    auth, async (req, res) => {
+    validate, auth, async (req, res) => {
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        
         const event = 
             await Event
                 .findById(req.params.eventid)
