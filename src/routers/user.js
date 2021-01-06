@@ -3,7 +3,8 @@ const { check } = require('express-validator');
 const { auth, validateApiKey, validate } = require('../middleware');
 const { Event, User, UserInvite, Plan } = require('../models');
 const { checkSignUp } = require('../external/switcher-api-facade');
-const { responseException, BadRequest, NotFoundError } = require('./common');
+const { responseException } = require('./common');
+const { BadRequest, NotFoundError } = require('../exceptions');
 const { validate_token } = require('../external/google-recaptcha');
 
 const router = new express.Router();

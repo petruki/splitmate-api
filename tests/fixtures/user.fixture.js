@@ -1,4 +1,5 @@
 const { User, Plan } = require('../../src/models');
+const { PlanType } = require('../../src/models/plan');
 
 const setupUserCollection = async () => {
     await User.deleteMany();
@@ -10,7 +11,8 @@ const setupUserCollection = async () => {
         email: 'user1@mail.com',
         password: '123',
     });
-    await Plan.setDefaultPlan(user1);
+    const plan = await Plan.findOne({ name: PlanType.FOUNDER });
+    user1.plan = plan._id;
     await user1.save();
 
     //setup User 2
@@ -22,6 +24,18 @@ const setupUserCollection = async () => {
     });
     await Plan.setDefaultPlan(user2);
     await user2.save();
+
+    return [
+        user1,
+        user2
+    ];
 };
 
-module.exports = { setupUserCollection };
+const getUser = (users, email) => {
+    return users.filter(user => user.email === email)[0];
+};
+
+module.exports = { 
+    setupUserCollection, 
+    getUser 
+};
