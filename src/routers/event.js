@@ -3,8 +3,11 @@ const { check } = require('express-validator');
 const { auth, verifyInputUpdateParameters, validate } = require('../middleware');
 const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
-const { Event, User, UserInvite, Item, Plan } = require('../models');
-const { responseException, BadRequest, NotFoundError } = require('./common');
+const { Event, UserInvite, Item, Plan } = require('../models');
+const { responseException } = require('./common');
+const { getEventById, getEvent } = require('../controller/event');
+const { BadRequest, NotFoundError } = require('../exceptions');
+const { getUserById, getUser } = require('../controller/user');
 
 const router = new express.Router();
 
@@ -58,16 +61,12 @@ router.post('/v1/invite_all/:id', [
     check('id', 'Invalid Event Id').isMongoId()
 ], validate, auth, async (req, res) => {
     try {
-        let event = await Event.findById(req.params.id);
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-
+        let event = await getEventById(req.params.id);
         await Plan.checkMaxMembers(req.user, event, req.body.emails.length);
 
         let member;
         for (let i = 0; i < req.body.emails.length; i++) {
-            member = await User.findOne({ email: req.body.emails[i] });
+            member = await getUser({ email: req.body.emails[i] });
             inviteMember(req.user, member, event, req.body.emails[i]);
         }
         
@@ -82,12 +81,8 @@ router.post('/v1/reminder/:id', [
 ], validate, auth, async (req, res) => {
     try {
         await checkSendMail('reminder');
-        const event = await Event.findById(req.params.id);
-
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-
+        const event = await getEventById(req.params.id);
+        
         const pendingItems = event.items
             .filter(item => !item.assigned_to)
             .map(item => item.name);
@@ -111,15 +106,8 @@ router.patch('/v1/transfer/:id/:organizer', [
     check('organizer', 'Invalid Member Id').isMongoId()
 ], validate, auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-
-        const user = await User.findById(req.params.organizer);
-        if (!user) {
-            throw new NotFoundError('user');
-        }
+        const event = await getEvent({ _id: req.params.id, organizer: req.user._id });
+        const user = await getUserById(req.params.organizer);
 
         await Plan.checkMaxEvents(user);
         event.organizer = user._id;
@@ -137,12 +125,7 @@ router.patch('/v1/:id', [
 ], verifyInputUpdateParameters(['name', 'description', 'date', 'location']
 ), validate, auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
-
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-        
+        const event = await getEvent({ _id: req.params.id, members: req.user._id });
         req.updates.forEach((update) => event[update] = req.body[update]);
         await event.save();
         res.send(event);
@@ -154,11 +137,7 @@ router.patch('/v1/:id', [
 router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.params.id, members: req.user._id });
-
-        if (!event) {
-            throw new NotFoundError('event');
-        }
+        const event = await getEvent({ _id: req.params.id, members: req.user._id });
 
         switch (req.params.action) {
             case 'add': {
@@ -228,12 +207,7 @@ router.patch('/v1/:id/:action/item', [check('id', 'Invalid Event Id').isMongoId(
 router.delete('/v1/:id', [check('id', 'Invalid Event Id').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
-        const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id });
-
-        if (!event) {
-            throw new NotFoundError('event');
-        }
-
+        const event = await getEvent({ _id: req.params.id, organizer: req.user._id });
         await event.remove();
         res.send({ message: `Event '${event.name}' deleted` });
     } catch (e) {

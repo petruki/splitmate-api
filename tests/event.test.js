@@ -19,9 +19,10 @@ afterAll(async () => {
 
 describe('Testing event', () => {
 
+  let users = [];
   let user1Token;
   
-  const setupUser = async () => {
+  const setupUsers = async () => {
     const user1 = await User.findOne({ username: 'user1' });
     user1.events_pending.push(event1._id);
     await user1.save();
@@ -29,7 +30,7 @@ describe('Testing event', () => {
 
   beforeAll(async () => {
     await planFixture.setupDefaultPlan();
-    await userFixture.setupUserCollection();
+    users = await userFixture.setupUserCollection();
     await setupEventCollection();
 
     const response = await request(app)
@@ -40,7 +41,7 @@ describe('Testing event', () => {
       });
 
     user1Token = response.body.jwt.token;
-    await setupUser();
+    await setupUsers();
   });
 
   test('EVENT - Should create event', async () => {
@@ -55,28 +56,6 @@ describe('Testing event', () => {
       }).expect(201);
   });
 
-  test('EVENT - Should NOT create event - Limit exceeded', async () => {
-    await request(app)
-      .post('/event/v1/create')
-      .set('Authorization', `Bearer ${user1Token}`)
-      .send({
-        name: 'New Event 1',
-        items: [{
-          name: 'Beer'
-        }]
-      }).expect(201);
-
-    await request(app)
-      .post('/event/v1/create')
-      .set('Authorization', `Bearer ${user1Token}`)
-      .send({
-        name: 'New Event 2',
-        items: [{
-          name: 'Beer'
-        }]
-      }).expect(400);
-  });
-
   test('EVENT - Should NOT create event - Name lenght is lower than 2', async () => {
     await request(app)
       .post('/event/v1/create')
@@ -84,6 +63,43 @@ describe('Testing event', () => {
       .send({
         name: 'N'
       }).expect(422);
+  });
+
+  test('EVENT - Should invite member to Event', async () => {
+    // given
+    // event created
+    const response = await request(app)
+      .post('/event/v1/create')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        name: 'New Event - Invite test',
+      });
+
+    // test
+    await request(app)
+      .post(`/event/v1/invite_all/${response.body._id}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        emails: [
+          'user2@mail.com'
+        ]
+      }).expect(200);
+
+    // test DB
+    const user1 = userFixture.getUser(users, 'user2@mail.com');
+    const user1Db = await User.findById(user1._id);
+    expect(user1Db.events_pending.includes(String(response.body._id)));
+  });
+
+  test('EVENT - Should NOT invite member to Event - Event not found', async () => {
+    await request(app)
+      .post(`/event/v1/invite_all/${new mongoose.Types.ObjectId()}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        emails: [
+          'user2@mail.com'
+        ]
+      }).expect(404);
   });
 
 });

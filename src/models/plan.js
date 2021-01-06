@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { BadRequest } = require('../routers/common');
+const { BadRequest } = require('../exceptions');
 const { Event } = require('./event');
 
 const PlanType = Object.freeze({
