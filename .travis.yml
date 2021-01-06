@@ -4,6 +4,11 @@ node_js:
 
 services: mongodb
 
+addons:
+  sonarcloud:
+    organization: "trackerforce"
+    token: ${SONAR_TOKEN}
+
 jobs:
   include:
     - stage: compile
@@ -12,6 +17,7 @@ jobs:
     - stage: test
       script:
         - npm test
+        - sonar-scanner
     - stage: deploy
       if: branch = master
       script:
