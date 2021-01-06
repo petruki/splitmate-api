@@ -1,6 +1,6 @@
+const { NotFoundError, BadRequest } = require('../exceptions');
 const { Event } = require('../models/event');
 const { UserInvite } = require('../models/user-invite'); 
-const { BadRequest } = require('../routers/common');
 
 async function getEvents(req, category) {
     let events;
@@ -35,7 +35,15 @@ async function getEvents(req, category) {
 }
 
 async function getEventById(eventId) {
-    return await Event.findById(eventId);
+    const event = await Event.findById(eventId);
+    if (!event) throw new NotFoundError('event');
+    return event;
+}
+
+async function getEvent(where) {
+    const event = await Event.findOne(where);
+    if (!event) throw new NotFoundError('event');
+    return event;
 }
 
 async function getEventsById(events) {
@@ -46,4 +54,5 @@ module.exports = {
     getEvents,
     getEventById,
     getEventsById,
+    getEvent
 };

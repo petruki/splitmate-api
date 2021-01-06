@@ -2,7 +2,8 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const { auth } = require('../middleware/index');
 const { Event } = require('../models/event');
-const { responseException, NotFoundError } = require('./common/index');
+const { responseException } = require('./common/index');
+const { NotFoundError } = require('../exceptions');
 
 const router = new express.Router();
 

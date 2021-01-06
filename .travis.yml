@@ -13,6 +13,7 @@ jobs:
       script:
         - npm test
     - stage: deploy
+      if: branch = master
       script:
         - echo "Ready to deploy..."
       deploy:
