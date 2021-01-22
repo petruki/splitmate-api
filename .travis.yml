@@ -2,6 +2,10 @@ language: node_js
 node_js:
   - "12"
 
+branches:
+  only:
+  - master
+
 services: mongodb
 
 addons:
@@ -11,15 +15,13 @@ addons:
 
 jobs:
   include:
-    - stage: compile
+    - stage: compile and test
       script:
         - npm install
-    - stage: test
-      script:
         - npm test
         - sonar-scanner
     - stage: deploy
-      if: branch = master
+      if: type NOT IN (pull_request)
       script:
         - echo "Ready to deploy..."
       deploy:
@@ -28,6 +30,5 @@ jobs:
         api_key: ${HEROKU_KEY}
 
 stages:
-  - compile
-  - test
-  - deploy
+  - compile and test
+  - deploy to staging
