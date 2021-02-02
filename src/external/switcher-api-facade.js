@@ -5,20 +5,20 @@ const apiKey = process.env.SWITCHER_API_KEY;
 const url = process.env.SWITCHER_API_URL;
 const offline = process.env.SWITCHER_API_OFFLINE === 'true';
 const environment = process.env.SWITCHER_ENV || 'default';
-const domainName = 'SpliteMATE';
+const domain = 'SpliteMATE';
 const component = 'splitmate-api';
-let switcher;
+
+Switcher.buildContext(
+    { url, apiKey, domain, component, environment },
+    { snapshotLocation: 'snapshot/', offline });
+
+const switcher = Switcher.factory();
 
 async function initSwitcher() {
-    if (!switcher) {
-        switcher = new Switcher(url, apiKey, domainName, component, environment, 
-            { snapshotLocation: 'snapshot/', offline });
-    
-        if (offline) {
-            console.log('Loading Switcher snapshot...');
-            await switcher.loadSnapshot();
-            console.log('Snapshot loaded');
-        }
+    if (offline) {
+        console.log('Loading Switcher snapshot...');
+        await Switcher.loadSnapshot();
+        console.log('Snapshot loaded');
     }
 }
 
