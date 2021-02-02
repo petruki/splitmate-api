@@ -8,6 +8,7 @@ const axios = require('axios');
 const restoreDb = require('./fixtures/restore-db');
 const planFixture = require('./fixtures/plan.fixture');
 const userFixture = require('./fixtures/user.fixture');
+var sandbox;
 
 beforeAll(() => Switcher.setTestEnabled());
 
@@ -15,6 +16,14 @@ afterAll(async () => {
   await restoreDb();
   await new Promise(resolve => setTimeout(resolve, 1000));
   await mongoose.disconnect();
+});
+
+beforeEach(function () {
+  sandbox = sinon.createSandbox();
+});
+
+afterEach(function () {
+  sandbox.restore();
 });
 
 describe('Testing user signup/signin', () => {
@@ -51,7 +60,7 @@ describe('Testing user signup/signin', () => {
 
   test('USER - Should NOT sign up - Token not provided', async () => {
     // mock
-    axiosPostStub = sinon.stub(axios, 'post');
+    axiosPostStub = sandbox.stub(axios, 'post');
 
     // given
     const mockedRecaptchaResponse = { data: { success: false } };
@@ -68,14 +77,11 @@ describe('Testing user signup/signin', () => {
       }).expect(500);
 
     expect(response.body.error).toEqual('Token is empty or invalid');
-
-    // restore
-    axiosPostStub.restore();
   });
 
   test('USER - Should NOT sign up - SignUp not available', async () => {
     // mock
-    axiosPostStub = sinon.stub(axios, 'post');
+    axiosPostStub = sandbox.stub(axios, 'post');
 
     // given
     const mockedRecaptchaResponse = { data: { success: true } };
@@ -95,14 +101,12 @@ describe('Testing user signup/signin', () => {
 
     expect(response.body.error).toEqual('Email test@mail.com not allowed');
 
-    // restore
-    axiosPostStub.restore();
     Switcher.forget('SIGNUP');
   });
 
   test('USER - Should sign up', async () => {
     // mock
-    axiosPostStub = sinon.stub(axios, 'post');
+    axiosPostStub = sandbox.stub(axios, 'post');
 
     // given
     const mockedRecaptchaResponse = { data: { success: true } };
@@ -118,9 +122,6 @@ describe('Testing user signup/signin', () => {
           password: '123',
           token: 'GOOGLE_RECAPTCHA_TOKEN'
       }).expect(201);
-
-    // restore
-    axiosPostStub.restore();
   });
 
   test('USER - Should NOT sign in - Invalid login', async () => {
