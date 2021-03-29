@@ -110,7 +110,6 @@ router.patch('/v1/transfer/:id/:organizer', [
         const user = await getUserById(req.params.organizer);
         
         await user.populate({ path: 'v_plan' }).execPopulate();
-        await Plan.checkMaxEvents(user);
         event.organizer = user._id;
         await event.save();
         res.send(event);
