@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
-const Switcher = require('switcher-client');
+const { Switcher, checkValue } = require('switcher-client');
+const { logger } = require('../util');
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const url = process.env.SWITCHER_API_URL;
@@ -16,17 +16,16 @@ const switcher = Switcher.factory();
 
 async function initSwitcher() {
     if (offline) {
-        console.log('Loading Switcher snapshot...');
+        logger('switcher-api', 'Loading Switcher snapshot...');
         await Switcher.loadSnapshot();
-        console.log('Snapshot loaded');
+        logger('switcher-api', 'Switcher loaded');
     }
 }
 
 async function checkSignUp(email) {
     await initSwitcher();
 
-    if (!await switcher.isItOn('SIGNUP', [
-        Switcher.StrategiesType.VALUE, email])) {
+    if (!await switcher.isItOn('SIGNUP', [checkValue(email)])) {
             throw new Error(`Email ${email} not allowed`); 
     }
 }
@@ -34,8 +33,7 @@ async function checkSignUp(email) {
 async function checkSendMail(action) {
     await initSwitcher();
 
-    if (!await switcher.isItOn('SENDMAIL', [
-        Switcher.StrategiesType.VALUE, action])) {
+    if (!await switcher.isItOn('SIGNUP', [checkValue(action)])) {
         throw new Error('Send email is not available');  
     }
 }

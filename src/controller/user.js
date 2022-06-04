@@ -68,7 +68,7 @@ async function createUser(req) {
     //save and generate auth tken
     const jwt = await user.generateAuthToken();
     //return plan attributes
-    await user.populate({ path: 'v_plan' }).execPopulate();
+    await user.populate({ path: 'v_plan' });
 
     return { user, jwt };
 }
@@ -78,7 +78,7 @@ async function signIn(req) {
         
     const user = await User.findByCredentials(req.body.username, req.body.password);
     const jwt = await user.generateAuthToken();
-    await user.populate({ path: 'v_plan' }).execPopulate();
+    await user.populate({ path: 'v_plan' });
 
     return { user, jwt };
 }

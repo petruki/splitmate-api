@@ -1,12 +1,12 @@
 const { app } = require('./app');
 const http = require('http');
 const Pusher = require('./pusher');
+const { logger } = require('./util');
 
 const port = process.env.PORT;
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 
-server.listen(port, () => {
-    new Pusher(server);
-    // eslint-disable-next-line no-console
-    console.log('Server is up on port ' + port);
+httpServer.listen(port, () => {
+    new Pusher(httpServer).init();
+    logger('index', `Server started on port ${port}`);
 });

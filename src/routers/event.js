@@ -88,7 +88,7 @@ router.post('/v1/reminder/:id', [
             .map(item => item.name);
 
         if (pendingItems.length) {
-            await event.populate({ path: 'v_members' }).execPopulate();
+            await event.populate({ path: 'v_members' });
             event.v_members.forEach(member => {
                 sendReminder(member.email, event.name, pendingItems.join(', '));
             });
@@ -109,7 +109,7 @@ router.patch('/v1/transfer/:id/:organizer', [
         const event = await getEvent({ _id: req.params.id, organizer: req.user._id });
         const user = await getUserById(req.params.organizer);
         
-        await user.populate({ path: 'v_plan' }).execPopulate();
+        await user.populate({ path: 'v_plan' });
         event.organizer = user._id;
         await event.save();
         res.send(event);
@@ -240,7 +240,7 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
                     await fromEmailInvitation[i].populate({ 
                         path: 'v_event',
                         select: '-items -members'
-                    }).execPopulate();
+                    });
                     events.push(fromEmailInvitation[i].v_event);
                 }
                 break;

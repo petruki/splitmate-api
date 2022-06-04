@@ -1,6 +1,6 @@
 const { app } = require('../src/app');
 const mongoose = require('mongoose');
-const Switcher = require('switcher-client');
+const { Switcher } = require('switcher-client');
 const request = require('supertest');
 const sinon = require('sinon');
 const axios = require('axios');
@@ -14,7 +14,7 @@ beforeAll(() => Switcher.setTestEnabled());
 
 afterAll(async () => {
   await restoreDb();
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 2000));
   await mongoose.disconnect();
 });
 

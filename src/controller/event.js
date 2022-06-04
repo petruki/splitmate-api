@@ -22,7 +22,7 @@ async function getEvents(req, category) {
             for (let i = 0; i < fromEmailInvitation.length; i++) {
                 await fromEmailInvitation[i].populate({ 
                     path: 'v_event'
-                }).execPopulate();
+                });
                 events.push(fromEmailInvitation[i].v_event);
             }
             break;
