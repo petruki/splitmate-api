@@ -1,11 +1,12 @@
-const socketio = require('socket.io');
+const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { User } = require('./models/user');
+const { logger } = require('./util');
 
 class Pusher {
-    constructor(server) {
-        this.io = socketio(server);
-        this.init(); 
+    constructor(httpServer) {
+        this.io = new Server(httpServer);
+        logger('pusher', 'Pusher initialized');
     }
 
     init() {
@@ -22,10 +23,12 @@ class Pusher {
             const user = await User.findOne({ _id: decoded._id, token });
     
             if (!user) {
+                logger('pusher', `User ${decoded._id} not found`);
                 throw new Error();
             }
             
             socket.join(socket.handshake.query.channel);
+            logger('pusher', `User ${user.username}:${socket.id} connected`);
             next();
         } catch (e) {
             next(new Error('Not authorized'));
@@ -35,6 +38,7 @@ class Pusher {
     onNotifyEvent(socket, req) {
         const pusherObject = JSON.parse(req);
         socket.broadcast.to(pusherObject.channel).emit(pusherObject.action, req);
+        logger('pusher', `Action ${pusherObject.action} on ${pusherObject.channel}`);
     }
 
 }

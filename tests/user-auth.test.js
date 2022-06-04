@@ -1,6 +1,6 @@
 const { app } = require('../src/app');
 const mongoose = require('mongoose');
-const Switcher = require('switcher-client');
+const { Switcher } = require('switcher-client');
 const request = require('supertest');
 const sinon = require('sinon');
 const axios = require('axios');

@@ -1,6 +1,20 @@
-![Splitmate API](https://raw.githubusercontent.com/trackerforce/splitmate-assets/master/logo/sm_logo.png)
+***
+
+<div align="center">
+<b>SplitMATE API</b><br>
+Split and manage anything you want with your mates
+</div>
+
+<div align="center">
 
 [![Build Status](https://travis-ci.com/trackerforce/splitmate-api.svg?branch=master)](https://travis-ci.com/trackerforce/splitmate-api)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=trackerforce_splitmate-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=trackerforce_splitmate-api)
+
+</div>
+
+***
+
+![Splitmate API](https://raw.githubusercontent.com/trackerforce/splitmate-assets/master/logo/sm_logo.png)
 
 # Requirements  
 - NodeJS

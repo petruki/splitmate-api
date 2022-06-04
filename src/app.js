@@ -18,6 +18,9 @@ if (process.env.ENV != 'test')
     Plan.startDefaultPlans();
 
 
+/*
+ * Initialize Express & GraphQL Server
+ */
 const app = express();
 const graphQLpath = '/graphql';
 const server = new ApolloServer({ 
@@ -26,7 +29,10 @@ const server = new ApolloServer({
     context: async ({ req, res }) => ({ req, res }) 
 });
 app.use(graphQLpath, auth);
-server.applyMiddleware({ app, graphQLpath });
+server.start().then(() => {
+    server.applyMiddleware({ app, graphQLpath });
+});
+
 
 /**
  * API Settings
@@ -43,11 +49,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/user', userRouter);
 app.use('/event', eventRouter);
 app.use('/poll', pollRouter);
-app.get('/check', (req, res) => {
+app.get('/check', (_req, res) => {
     res.status(200).send({ message: 'All good', code: 200 });
 });
 
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
     res.status(404).send({ error: 'Operation not found' });
 });
 
