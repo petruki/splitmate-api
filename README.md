@@ -7,7 +7,7 @@ Split and manage anything you want with your mates
 
 <div align="center">
 
-[![Build Status](https://travis-ci.com/trackerforce/splitmate-api.svg?branch=master)](https://travis-ci.com/trackerforce/splitmate-api)
+[![Master CI](https://github.com/trackerforce/splitmate-api/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/trackerforce/splitmate-api/actions/workflows/master.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=trackerforce_splitmate-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=trackerforce_splitmate-api)
 
 </div>

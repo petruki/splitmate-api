@@ -34,6 +34,11 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/splitmate-api-test
+          API_SECRET: API_SCRET
+          JWT_SECRET: JWT_SECRET
+          SWITCHER_API_OFFLINE: true
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
