@@ -14,7 +14,7 @@ beforeAll(() => Switcher.setTestEnabled());
 
 afterAll(async () => {
   await restoreDb();
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 2000));
   await mongoose.disconnect();
 });
 
