@@ -5,9 +5,9 @@ const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
 const { Event, UserInvite, Item, Plan } = require('../models');
 const { responseException } = require('./common');
-const { getEventById, getEvent } = require('../controller/event');
+const { getEventById, getEvent } = require('../services/event');
 const { BadRequest, NotFoundError } = require('../exceptions');
-const { getUserById, getUser } = require('../controller/user');
+const { getUserById, getUser } = require('../services/user');
 
 const router = new express.Router();
 

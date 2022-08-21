@@ -2,7 +2,7 @@ const express = require('express');
 const { check } = require('express-validator');
 const { auth, validate } = require('../middleware');
 const { Event, User } = require('../models');
-const { createUser, signIn, joinEvent, dismissEvent, leaveEvent, removeUserFromEvent } = require('../controller/user');
+const { createUser, signIn, joinEvent, dismissEvent, leaveEvent, removeUserFromEvent } = require('../services/user');
 const { responseException } = require('./common');
 const { BadRequest, NotFoundError } = require('../exceptions');
 

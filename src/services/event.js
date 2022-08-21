@@ -19,11 +19,11 @@ async function getEvents(req, category) {
                 .find({ _id: req.user.events_pending });
 
             const fromEmailInvitation = await UserInvite.find({ email: req.user.email });
-            for (let i = 0; i < fromEmailInvitation.length; i++) {
-                await fromEmailInvitation[i].populate({ 
+            for (const element of fromEmailInvitation) {
+                await element.populate({ 
                     path: 'v_event'
                 });
-                events.push(fromEmailInvitation[i].v_event);
+                events.push(element.v_event);
             }
             break;
         }
