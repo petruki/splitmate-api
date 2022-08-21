@@ -5,9 +5,9 @@ const { checkSendMail } = require('../external/switcher-api-facade');
 const { sendInvite, sendReminder } = require('../external/sendgrid');
 const { Event, UserInvite, Item, Plan } = require('../models');
 const { responseException } = require('./common');
-const { getEventById, getEvent } = require('../controller/event');
+const { getEventById, getEvent } = require('../services/event');
 const { BadRequest, NotFoundError } = require('../exceptions');
-const { getUserById, getUser } = require('../controller/user');
+const { getUserById, getUser } = require('../services/user');
 
 const router = new express.Router();
 
@@ -65,9 +65,9 @@ router.post('/v1/invite_all/:id', [
         await Plan.checkMaxMembers(req.user, event, req.body.emails.length);
 
         let member;
-        for (let i = 0; i < req.body.emails.length; i++) {
-            member = await getUser({ email: req.body.emails[i] });
-            inviteMember(req.user, member, event, req.body.emails[i]);
+        for (const element of req.body.emails) {
+            member = await getUser({ email: element });
+            inviteMember(req.user, member, event, element);
         }
         
         res.send({ message: 'Invitation has been sent' });
@@ -236,12 +236,12 @@ router.get('/v1/my_events/:category', auth, async (req, res) => {
                     .select('-items -members');
 
                 const fromEmailInvitation = await UserInvite.find({ email: req.user.email });
-                for (let i = 0; i < fromEmailInvitation.length; i++) {
-                    await fromEmailInvitation[i].populate({ 
+                for (const element of fromEmailInvitation) {
+                    await element.populate({ 
                         path: 'v_event',
                         select: '-items -members'
                     });
-                    events.push(fromEmailInvitation[i].v_event);
+                    events.push(element.v_event);
                 }
                 break;
             }
@@ -314,10 +314,10 @@ router.get('/v1/:eventid/item/:id', [
             throw new NotFoundError('event');
         }
 
-        const item = event.items.filter(item => String(item._id) === String(req.params.id));
-        if (!item.length) throw new NotFoundError('item');
+        const items = event.items.filter(item => String(item._id) === String(req.params.id));
+        if (!items.length) throw new NotFoundError('item');
 
-        res.send(item[0]);
+        res.send(items[0]);
     } catch (e) {
         responseException(res, e, 500);
     }

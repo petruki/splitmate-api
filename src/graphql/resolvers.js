@@ -1,12 +1,12 @@
-const { getEvents, getEventsById } = require('../controller/event');
-const { getUserById, getUsersById, getUserPlan } = require('../controller/user');
+const { getEvents, getEventsById } = require('../services/event');
+const { getUserById, getUsersById, getUserPlan } = require('../services/user');
 
 const resolvers = {
     Query: { 
-        events(parent, args, context) {
+        events(_parent, args, context) {
             return getEvents(context.req, args.category);
         },
-        me(parent, args, context) {
+        me(_parent, _args, context) {
             return context.req.user;
         }
     },
